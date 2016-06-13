@@ -1,0 +1,45 @@
+//090801:arm在thmb下的编译结果:
+
+TGUI:
+tcheckbox: 280 bytes of CODE memory (+ 136 bytes shared) 
+tedit: 86 bytes of CODE memory (+ 56 bytes shared) 
+tedit_dec: 892 bytes of CODE memory (+ 152 bytes shared) 
+tguibase:  304 bytes of CODE memory (+ 56 bytes shared) 
+
+tguimath: 208 bytes of CODE  memory (+ 48 bytes shared) 
+  12 bytes of CONST memory 
+tguinotify:   84 bytes of CODE memory (+ 80 bytes shared) 
+listbox: 344 bytes of CODE memory (+ 128 bytes shared) 
+listboxex:  996 bytes of CODE memory (+ 224 bytes shared) 
+tradiobutton:  156 bytes of CODE memory (+ 80 bytes shared) 
+ttext: 622 bytes of CODE memory (+ 192 bytes shared) 
+widget: 780 bytes of CODE memory (+ 128 bytes shared) 
+widgetpaint: 1 854 bytes of CODE memory (+ 176 bytes shared) 
+widgetshare: 306 bytes of CODE memory (+ 90 bytes shared) 
+twin: 474 bytes of CODE memory (+ 96 bytes shared) 
+twinmng_row:  478 bytes of CODE memory (+ 84 bytes shared) 
+   4 bytes of DATA memory 
+
+//共：代码：7864,常量:12:变量4
+
+TMENU:
+lan: 42 bytes of CODE memory (+ 8 bytes shared) 
+tmenu.c: 422 bytes of CODE  memory (+ 252 bytes shared) 
+  40 bytes of CONST memory 
+ 237 bytes of DATA  memory 
+checkbox: 220 bytes of CODE memory (+ 120 bytes shared) 
+mnumadj: 794 bytes of CODE memory (+ 256 bytes shared) 
+radiobox: 194 bytes of CODE memory (+ 104 bytes shared) 
+submenu: 180 bytes of CODE memory (+ 88 bytes shared) 
+base: 104 bytes of CODE memory (+ 48 bytes shared) 
+
+//共：代码：1956,常量:40:变量237
+
+
+//全部共：代码：9820,常量:52:变量241
+
+
+
+
+
+

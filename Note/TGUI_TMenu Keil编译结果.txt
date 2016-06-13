@@ -1,0 +1,255 @@
+09031:
+//原来：Program Size: data=17.2 xdata=12821 code=23564
+//加后：Program Size: data=17.2 xdata=14037 code=50702
+//增加: xdata=1216 code=27138
+
+tedit_dec:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2019    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      51
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tedit:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    195    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tcheckbox
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    769    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      40
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tmng+row
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1104    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      3      28
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+twin:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1426    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      60
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+twidgetshare
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    905    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      44
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+twidgetpaint:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   5567    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----     185
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+twidget:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1930    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      44
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+
+ttext:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1945    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      64
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tradiobutton:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    427    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      28
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+TMENUNOTIFY:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ---- 
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+TMENUBASE :
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    263    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      15
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tsubmenu:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    440    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      39
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+TMENU_RADIOBOX:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    644    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      41
+C51 COMPILER V7.10   TMENU_RADIOBOX                                                        08/01/2009 00:03:04 PAGE 3   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tmenu_mnumadj:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2301    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      99
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+tmenu_checkbox
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    741    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      42
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tmenu:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1121    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    255      15
+C51 COMPILER V7.10   TMENU                                                                 08/01/2009 00:03:03 PAGE 6   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tlistboxex:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2616    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      71
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tlistbox:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    852    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      35
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tguinotify:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    409    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       8
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tguimath:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    420    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     10       8
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+tguibase:
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    632    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      24
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+计算：26716

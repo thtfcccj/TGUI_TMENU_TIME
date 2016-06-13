@@ -1,0 +1,47 @@
+//090801: IAR For 430下的编译结果:
+
+TGUI:
+checkbox:  338 bytes of CODE memory 
+edit: 106 bytes of CODE memory 
+edit_dec: 986 bytes of CODE memory 
+base: 292 bytes of CODE memory 
+math: 226 bytes of CODE  memory 
+  10 bytes of CONST memory 
+notify: 134 bytes of CODE memory 
+listbox: 362 bytes of CODE memory 
+listboxex: 986 bytes of CODE memory 
+radiobutton:  186 bytes of CODE memory 
+text: 744 bytes of CODE memory 
+widget: 784 bytes of CODE memory 
+widgetpaint: 1 900 bytes of CODE memory 
+share: 368 bytes of CODE memory 
+twin: 532 bytes of CODE memory 
+winmng_row: 480 bytes of CODE memory 
+   2 bytes of DATA memory 
+
+
+//共：代码：8424,常量:10:变量2
+
+TMENU:
+lan: 36 bytes of CODE memory 
+menu: 440 bytes of CODE  memory 
+  40 bytes of CONST memory 
+ 217 bytes of DATA  memory 
+checkbox: 262 bytes of CODE memory 
+MNumAdj:  902 bytes of CODE memory 
+radiobox: 228 bytes of CODE memory 
+submenu 186 bytes of CODE memory 
+menubase: 118 bytes of CODE memory 
+menunotify:  0 bytes of memory 
+
+ 
+//共：代码：2389,常量:40:变量217
+
+
+//全部共：代码：10813,常量:50:变量219
+
+
+
+
+
+
