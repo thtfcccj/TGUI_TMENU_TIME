@@ -70,7 +70,10 @@ unsigned short TImeNum_Key(struct _TImeNum *pNum, unsigned char GuideKey)
     char Chr = '0' + (pNum->FirstKey * 2);
     if(GuideKey == pNum->FirstKey)//相同按键了
       Chr++;//为下一个
-    //else //第二次按任意键认为是首个
+    else{ //第二次按任意键认为是首个确认，同时将第二个作为首个
+     pNum->NumTimer = TIME_NUM_TIMER_OV;
+     pNum->FirstKey = GuideKey;
+    }
     return (unsigned short)Chr;
   }
   //第一次时
