@@ -1,7 +1,8 @@
-/* ----------------------------------------------------------------------------
- *                TMenu用户消息通报模块
- * --------------------------------------------------------------------------*/
+/**************************************************************************
 
+             TMenu用户消息通报模块
+
+**************************************************************************/
 #ifndef __T_MENU_NOTIFY_H 
 #define __T_MENU_NOTIFY_H 
 
@@ -39,9 +40,18 @@
 //当菜单系统不能获得菜单头(phHeader == NULL)时,从函数据得到菜单头
 //通过通报函数pv形参获得，必须是一个完整字符
 #define     TM_NOTIFY_GET_HEADER  4
-//当菜单系统不能获得项(pv == NULL)时,从函数据得到项数据
+//当菜单系统不能获得项(pv == NULL)时,从用户空间获得到项数据
 //此时，通报函数pv形参指向的第一个数据即为为指定项
 #define     TM_NOTIFY_GET_ITEM    5
+
+//通报光标改变，以用于在RPC客户端中，提前准备要进入菜单的内容
+//pv为, 首个参数(TItemSize_t型)即为新的光标位置(现只响应子菜单模式)
+#define     TM_NOTIFY_CUSOR_CHANGED  6
+
+//获得子菜单的菜单头,在RPC客户端中,子菜单可能不完整，故可能不能直接得到菜单名称
+//故先调用以从用户空间获取,用户不处理时才调用子菜单里的菜单头
+//pv为需填充的字符串指针，首个参数(unsigned char)即为菜单位置
+#define     TM_NOTIFY_GET_SUB_HEADER  7
 
 //控件扩展通报起始,
 //通报类型64-127为控件自身扩展的通报,控制间通报类型一般可重复可以重复
@@ -50,38 +60,6 @@
 //用户扩展通报起始
 //通报类型128-255为部件自定义通报,由用户决定且一般不可以重复
 #define     TM_NOTIFY_USER_BASE    128
-
-
-/**********************************************************************
-                      回调函数ID号分配
-//范围:0-255,按执行时间效率分配:,越告前执行效率越高
-**********************************************************************/
-
-//内部控件回调函数ID号分配,
-#define   TMENU_CBFUNID_NULL_MENU           0		//空ID号,内部保留,为子菜单等不需要回调函数时使用
-#define   TMENU_CBFUNID_TOP_MENU            1   //顶层菜单通报
-#define   TMENU_CBFUNID_SET_TIME            2   //时间设置
-#define   TMENU_CBFUNID_SET_POINT_GLOBAL    3   //测点全局参数设置
-#define   TMENU_CBFUNID_SEL_POINT           4   //测点选择
-#define   TMENU_CBFUNID_POINT_ITEM_MENU     5   //测点项目选择
-#define   TMENU_CBFUNID_SET_POINT_PARA      6   //测点参数设置
-#define   TMENU_CBFUNID_POINT_HIDDEN_MENU   7   //测点屏蔽设置
-#define   TMENU_CBFUNIDPOINT_STATUS_PARA    8   //测点状态
-#define   TMENU_CBFUNID_SYS_INFO            9   //系统信息
-#define   TMENU_CBFUNID_REC_MENU            10   //记录菜单
-#define   TMENU_CBFUNID_REC_MENU_PER        11   //记录各自菜单
-#define   TMENU_CBFUNID_SYS_PARA            12   //系统参数设置菜单
-#define   TMENU_CBFUNID_IN_SPECTRUM         13   //进入光谱模式菜单
-#define   TMENU_CBFUNID_SET_PASS            14   //修改当前密码
-#define   TMENU_CBFUNID_VALID_CHANNEL       15   //有效通道设置
-#define   TMENU_CBFUNID_GET_POWER           16   //获得权限
-#define   TMENU_CBFUNID_FORCE_ACT           17   //强制动作
-#define   TMENU_CBFUNID_HAND_ALARM          18   //手动报警
-#define   TMENU_CBFUNID_SET_SLAVE           19   //手动报警
-#define   TMENU_CBFUNID_POINT_USED_MENU     20   //手动报警
-
-
-
 
 /**********************************************************************
                          TMenu消息通报宏替换
@@ -111,7 +89,8 @@
   //3:通报函数的执行宏
   #define TMENU_NOTIFY_RUN(TMenuNotifyFun,Type,pv) \
     TMenuNotifyFun(Type,pv)
-#endif
+  
+#endif //TMENU_DIS_P_FUN
 
 //----------------TMenu消息传递不支持函数指针的替换函数------------------
 
@@ -127,7 +106,7 @@ void TMenupFunReplace(unsigned char Type,//通报类型
 
 #define TMenupFunReplace(Type,pv,ID) do{}while(0)
 
-#endif
+#endif //TMENU_DIS_P_FUN
 
 
 #endif

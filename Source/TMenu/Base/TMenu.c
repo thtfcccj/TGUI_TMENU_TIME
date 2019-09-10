@@ -1,12 +1,8 @@
-/* ----------------------------------------------------------------------------
- *                TMenu总体
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TMenu基本构件总体实现
 
-//说明:
-//TMenu菜单系统为专为单片机嵌入式系统开发的通用菜单调整系统
-//它建立在TGUI之上,并使用静态窗口管理机制
-
+*******************************************************************************/
 #include "TMenu.h"
 #include "TMenu_CheckBox.h"
 #include "TMenu_MNumAdj.h"
@@ -14,9 +10,11 @@
 #include "TMenu_SubMenu.h"
 #include "TMenu_Buf.h"
 #include "TMenu_EditSel.h"
-#include "TMenu_EditString.h"
+#include <string.h>
 
-#include "string.h"
+#ifndef TMENU_DIS_EDIT_STRING 
+  #include "TMenu_EditString.h"
+#endif 
 
 /**********************************************************************
                      内部数据结构-菜单管理器
@@ -148,6 +146,11 @@ void TMenu_Refresh(void)
     #endif
     return;
   }
+  //编辑字符串模式暂无强制刷新功能
+  if(Type == TMTYPE_EDITSTRING){
+    return;
+  }
+  
   //其它模式直接利用继承关系
   ListBox_PaintAll((TListbox_t *)(&pMng->vData));
 }

@@ -1,17 +1,16 @@
-/* ----------------------------------------------------------------------------
- *                TMenu编辑选择模式实现
-*
-*注:这里只实现显示,调整通过子模块实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
-
+                  TMenu菜单之编辑选择模式实现
+注:这里只实现显示,调整通过子模块实现
+*******************************************************************************/
 //在扩展列表框用前后缀实现显示功能:
 //  当为不可编辑时,调整项提示在内容中,数值在后缀中,可实现查看切换
 //  当为编辑选择时,调整项提示在前缀中,数值在内容中,可实现数值调整切换
+
 #include "TMenu.h"
 #include "TMenu_EditSel.h"
 #include "TGUIMath.h"
-#include "string.h" 
+#include <string.h>
 
 //其中:标志定义为:
 #define _FLAG_ENTER    0x08       //按保存键
@@ -23,17 +22,18 @@ static char *_pGetItemHeader(const TMenu_t *pMenu,
                              unsigned char HeaderW)    //指向的菜单系统
 {
   //数据右对齐,最后加": "
-  char *pString = TMenu_pGetBuf();
   const char *pHeader = TM_GetSubMenuHeader(pMenu,CurItem);
-    
+  char *pStrStart = TMenu_pGetBuf();
+  if(pHeader == pStrStart) pStrStart += (strlen(pHeader) + 1);//防止使用缓存重复
+  
   unsigned char Start = HeaderW - (strlen(pHeader) + 2);
-  memset(pString, ' ', Start);
-  pString += Start;
-  pString = strcpy_ex(pString,pHeader);
+  memset(pStrStart, ' ', Start);
+  char *pString = pStrStart + Start;
+  pString = Tstrcpy_ex(pString,pHeader);
   *pString++ = ':';
   *pString++ = ' ';
   *pString = '\0';
-  return TMenu_pGetBuf();
+  return pStrStart;
 }
 
 //------------------------得到项数据函数----------------------------
@@ -182,7 +182,7 @@ signed char TMenu_EditSelCreate(const TMenu_t *pMenu,    //指向的菜单系统
   if(TM_GetType(pMenu) & TM_MEDITSEL_EN_EDIT){//调整模式
     Style = TLISTBOXEX_ALIGN_LEFT | TLISTBOXEX_ANTI_WORD2 | 
       TLISTBOXEX_PREFIX | TLISTBOXEX_EN_APPEND;
-    if(TM_GetType(pMenu) & TM_MEDITSEL_EN_EDIT)//群保存时强制有保存与退出键
+    if(!(TM_GetType(pMenu) & TM_MEDITSEL_DIS_GRP_SAVE))//群保存时强制有保存与退出键
       Flag |= TCHECKBOX_EN_SAVE | TCHECKBOX_EN_RETURN;
   }
   else{ 

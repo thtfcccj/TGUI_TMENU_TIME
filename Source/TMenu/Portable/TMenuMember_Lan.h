@@ -1,38 +1,29 @@
-/* ----------------------------------------------------------------------------
- *       TMenuMember的多国语言定义
- * --------------------------------------------------------------------------*/
+/**************************************************************************
 
+             TMenuMember的多国语言选择支持模块
+
+**************************************************************************/
 #ifndef __T_MENU_MEMBER_LAN_H 
 #define __T_MENU_MEMBER_LAN_H
 
-//直接重定向为使用Language.h的定义：
-#include "Language.h"
+#include "TMenuCfg.h"
 
-#define     LAN_COUNT        LANGUAGE_COUNT
+#ifdef TM_EN_MUTI_LAN //多国语言选择时单独定义
+  #include "TMenuMember_MutiLan.h"
+#else 
 
-//多国语言定义,若需实现此功能，则必须定义多国语言环境
-#define eLan_t eLanguage_t
-#define eEn eEnglish
-#define eCh eChinese
+/**************************************************************************
+                       不支持多国语言时定义
+**************************************************************************/
 
+//--------------------------相关类型定义------------------------
+#define LanCode_t char
 
-//多国语言编码静态结构,即在程序存储器上实现的结构
-#define LanCode_t LanguageCode_t
-
-
-//----------------------判断字符串是否全角对齐函数-----------------
-//未对齐时返回0
-int Lan_IsCheckSBCCaseAlign(const char *pString,unsigned int Len);
+//--------------------由LanCode_t结构得到字符串----------------------
+//const char *pLanCodeToChar(LanCode_t *pLanCode)
+#define pLanCodeToChar(lanCode) lanCode
 
 
-/********************************************************************
-                       回调函数
-********************************************************************/
-//-----------------------得到系统当前语种------------------------
-//enum eLan_t GetLan(void); 
-#include "GUI_Task.h"
-#define GetLan() GetLanguage()
-
-
+#endif //#ifndef SUPPORT_MUTI_LAN 
 #endif
 

@@ -1,15 +1,14 @@
-/* ----------------------------------------------------------------------------
- *                TGUI通用型函数
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                   TGUI基本构件-相关共享函数实现
 
-
+*******************************************************************************/
 #include "TGUICfg.h"
 #include "TGUIBase.h"
-#include "string.h"
+#include <string.h>
 
 //-----------------------由项总数得到占位函数-----------------------
-unsigned char GetItemsPlace(TItemSize_t Items)
+unsigned char TGetItemsPlace(TItemSize_t Items)
 {
   if(Items <= 9) return 1;
   if(Items <= 99) return 2;
@@ -24,29 +23,29 @@ unsigned char GetItemsPlace(TItemSize_t Items)
 }
 
 //-----------------------得到两字符右对齐后的长度函数-----------------------
-unsigned char GetAlignLenR(unsigned char Len,     //原字符长度,<128
+unsigned char TGetAlignLenR(unsigned char Len,     //原字符长度,<128
                           unsigned char Append) //附加字符长度,<128
 {
   Len += Append;
   #ifdef  TGUI_WORD_ALIGN
-  if(Len & 0x01) return Len + 1;
+    if(Len & 0x01) return Len + 1;
   #endif
   return Len;
 }
 
 //-----------------------得到两字符左对齐后的长度函数-----------------------
-unsigned char GetAlignLenL(unsigned char Len,     //原字符长度,<128,> 1
+unsigned char TGetAlignLenL(unsigned char Len,     //原字符长度,<128,> 1
                           unsigned char Append) //附加字符长度,<128
 {
   Len += Append;
   #ifdef  TGUI_WORD_ALIGN
-  if(Len & 0x01) return Len - 1;
+    if(Len & 0x01) return Len - 1;
   #endif
   return Len;
 }
 
 //-----------------------转换为字符串-显示为最简函数----------------------
-unsigned char Value2StringMin(TSigned_t Value,
+unsigned char TValue2StringMin(TSigned_t Value,
                             char *pString,//接收缓冲
                             unsigned char Min)//保证的最小位数
 {
@@ -114,29 +113,19 @@ unsigned char Value2StringMin(TSigned_t Value,
 //-----------------------得到两字符对齐后的长度函数-----------------------
 //当需要双字节对齐时,未对齐时在该位置填充' '
 //返回填充后的缓冲
-char *pAlignString(TItemSize_t ItemLen,//字符长度
+char *pTAlignString(TItemSize_t ItemLen,//字符长度
                    char *pString)//接收缓冲     
 {
   #ifdef  TGUI_WORD_ALIGN
-  if(ItemLen & 0x01) *pString++ = ' ';
+    if(ItemLen & 0x01) *pString++ = ' ';
   #endif
   return pString;
 }
 
-//------------------字符串查找函数-----------------------
-/*/由C++库中提出,若string库中有,则需将其注释掉
-const char *strchr(const char *s, char ch)
-{
-  for (; *s != ch; ++s)
-    if (*s == '\0')
-      return (0);
-  return ((char *)s);
-}*/
-
 //------------------字符串扩展拷贝函数-----------------------
 //1:响应结束与换行字符,
 //2:返回结束的位置
-char *strcpy_ex(char *s1, const char *s2)
+char *Tstrcpy_ex(char *s1, const char *s2)
 {
   char s = *s2++;
   while((s != '\0') && (s != '\n')){

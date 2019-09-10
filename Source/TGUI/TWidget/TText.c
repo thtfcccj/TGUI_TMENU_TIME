@@ -1,12 +1,12 @@
-/* ----------------------------------------------------------------------------
- *                文本框扩展控件实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TWidget之扩展文本框控件实现
+
+*******************************************************************************/
 #include "TText.h"
-#include "string.h"
+#include <string.h>
 
 #include "TWidgetShare.h"
-
 //------------------------到达文本指定行函数-----------------------------
 //返回NULL表示该行未找到
 static const char* _GoRow(TText_t *pText,
@@ -74,19 +74,19 @@ static const void *_ItemNotify(TText_t *pText,
   pString = _GoRow(pText,Item);
   StrLen = (strchr(pString,'\n') - pString);
   if(Align == TTEXT_ALIIGN_CENTER){
-    ItemSpace = GetAlignLenR((TListbox_GetW((TText_t*)pText) - StrLen) >> 1,0);
+    ItemSpace = TGetAlignLenR((TListbox_GetW((TText_t*)pText) - StrLen) >> 1,0);
     memset(pBuf,' ',ItemSpace);pBuf += ItemSpace;//前面填充
-    pBuf = strcpy_ex(pBuf,pString);//填充内容
+    pBuf = Tstrcpy_ex(pBuf,pString);//填充内容
     //考虑前对齐时可能往前移了一个空格,后需要补齐
-    ItemSpace = GetAlignLenR((TListbox_GetW((TText_t*)pText) - StrLen - 1) >> 1,0);
+    ItemSpace = TGetAlignLenR((TListbox_GetW((TText_t*)pText) - StrLen - 1) >> 1,0);
     memset(pBuf,' ',ItemSpace); pBuf += ItemSpace;//后面填充
   }
   else if(Align == TTEXT_ALIGN_LEFT){
     ItemSpace = TListbox_GetW((TText_t*)pText) - StrLen;
-    pBuf = strcpy_ex(pBuf,pString);//填充内容
+    pBuf = Tstrcpy_ex(pBuf,pString);//填充内容
   }
   else if(Align == TTEXT_ALIGN_RIGHT){
-    pBuf = strcpy_ex(pBuf,pString);//填充内容
+    pBuf = Tstrcpy_ex(pBuf,pString);//填充内容
     ItemSpace = TListbox_GetW((TText_t*)pText) - StrLen;
     memset(pBuf,' ',ItemSpace); pBuf += ItemSpace;//后面填充
   }

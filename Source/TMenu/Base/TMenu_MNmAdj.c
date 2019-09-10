@@ -1,7 +1,8 @@
-/* ----------------------------------------------------------------------------
- *                TMenu多值调整模式实现
-*注:这里只实现显示,调整通过子模块实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
+
+                  TMenu菜单之多值调整模式实现
+注:这里只实现显示,调整通过子模块实现
+*******************************************************************************/
 
 //因TGUI里没有多值调整模式,这里实现为:MNumAdj用来显示内容,
 //若调整时,在显示内容上叠加Win窗口显示当前调整项的内容.
@@ -14,7 +15,7 @@
 #include "TMenu.h"
 #include "TMenu_MNumAdj.h"
 #include "TGUIMath.h"
-#include "string.h" 
+#include <string.h>
 
 #include "TEdit_Float.h"  //不支持浮点数模式时，其内部编译为空
 
@@ -119,9 +120,9 @@ void _EnterEditMode(const TMenu_t *pMenu,//指向的菜单系统
     TEditFloat(&pMNumAdjData->Edit,
              hWin,    //依赖的窗口,数据缓冲区>Len
              //初始化值
-             Data2Float(pMNumAdjData->User.Value[pMNumAdjData->User.CurItem]),    
-             Data2Float(pDesc->Max),       //最大值,决定数值长度
-             Data2Float(pDesc->Min),       //最小值
+             TData2Float(pMNumAdjData->User.Value[pMNumAdjData->User.CurItem]),    
+             TData2Float(pDesc->Max),       //最大值,决定数值长度
+             TData2Float(pDesc->Min),       //最小值
              pMNumAdjData->User.Desc.Flag & MNUM_DOT_POS_MASK,//小数点位置,可用于用整数模拟小数显示
              Flag,                  //相关配置
              TGUI_NOTIFY_PASS(TMenu_MNumAdjEditNotify,TGUI_CBFUNID_TMENU_MNUM_EDIT));//回调函数
@@ -145,7 +146,7 @@ static char *_pGetItemHeader(const TMenu_t *pMenu,
   unsigned char Start = HeaderW - (strlen(pHeader) + 2);
   memset(pString, ' ', Start);
   pString += Start;
-  pString = strcpy_ex(pString,pHeader);
+  pString = Tstrcpy_ex(pString,pHeader);
   *pString++ = ':';
   *pString++ = ' ';
   *pString = '\0';
@@ -172,16 +173,16 @@ static char *_pGetItem(const TMenu_t *pMenu,//指向的菜单系统
   //根据类型显示值
   switch(Flag & MNUM_TYPE_MASK){
   case MNUM_TYPE_DEC:
-    pString = pNum2StringFlag(pMNumAdjData->User.Value[CurItem],
+    pString = pTNum2StringFlag(pMNumAdjData->User.Value[CurItem],
                               pString,
-                              GetNumLen(pDesc->Max,pDesc->Min),//显示长度
+                              TGetNumLen(pDesc->Max,pDesc->Min),//显示长度
                               Flag);  //标志与小数点
     break;
   case MNUM_TYPE_FLOAT:
-    pString = pFloat2StringFlag(Data2Float(pMNumAdjData->User.Value[CurItem]),
+    pString = pTFloat2StringFlag(TData2Float(pMNumAdjData->User.Value[CurItem]),
                               pString,
-                              GetFloatLen(Data2Float(pDesc->Min),
-                                          Data2Float(pDesc->Max),
+                              TGetFloatLen(TData2Float(pDesc->Min),
+                                          TData2Float(pDesc->Max),
                                           Flag & 0x07),//显示长度
                               Flag);  //标志与小数点
 

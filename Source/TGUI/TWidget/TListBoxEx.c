@@ -1,13 +1,13 @@
-/* ----------------------------------------------------------------------------
- *                列表框扩展控件实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TWidget之列表框扩展控件实现
+
+*******************************************************************************/
 #include "TListboxEx.h"
 #include "TWidgetShare.h"
-#include "string.h"
+#include <string.h>
 
 #define   _FOCUS_APPEND     0x80    //在附加项里标志
-
 
 //TListboxEx_t内部标志定义为:
 //0-6bit表示有效字符宽度
@@ -69,7 +69,7 @@ static void _AutiNotify(TListboxEx_t *pListboxEx,
   
   //有序号时(序号不反显),加上序号长度,序号跟了一个:".",计算对齐后的长度,
   if(Style & TLISTBOXEX_EN_NO)
-    ItemX += GetAlignLenR(GetItemsPlace(TListbox_GetItems((TListboxEx_t*)pListboxEx)),1);
+    ItemX += TGetAlignLenR(TGetItemsPlace(TListbox_GetItems((TListboxEx_t*)pListboxEx)),1);
   //得到字符长度
   pString = TGUI_NOTIFY_RUN(cbGUINotify,pListboxEx,TGUI_NOTIFY_GET_ITEM,pvData);
   ItemW += strlen(pString);
@@ -79,14 +79,14 @@ static void _AutiNotify(TListboxEx_t *pListboxEx,
   W = TListbox_GetDispW((TListboxEx_t*)pListboxEx);
   if(W < ItemW) W = ItemW; //扩充长度适应内容
   if(Style == TLISTBOXEX_ALIIGN_CENTER)//局中对齐时,排除左测空白区
-    ItemX += GetAlignLenR((W - ItemW) >> 1,0);
+    ItemX += TGetAlignLenR((W - ItemW) >> 1,0);
   else if(Style == TLISTBOXEX_ALIGN_RIGHT)//右对齐时,排除左测空白区
-    ItemX += GetAlignLenR(W - ItemW, 0);
+    ItemX += TGetAlignLenR(W - ItemW, 0);
   else if(Style == TLISTBOXEX_ALIGN_LEN){ //项长度对齐时,排除前面空白区
     W = pListboxEx->ValidW;
 	  ItemSpace = TWidget_GetHPageSizeEnNotify((TWidget_t*)pListboxEx);
       if((W) <  ItemSpace){  //项总长小于页宽时,局中对齐
-      ItemX +=  GetAlignLenL((ItemSpace - (W)) >> 1,0);
+      ItemX +=  TGetAlignLenL((ItemSpace - (W)) >> 1,0);
     }
   }
   else{ //左对齐时,以左测第一个非空字符作为起始反显
@@ -107,10 +107,10 @@ static char *pFullNO(TListboxEx_t *pListboxEx,
 {
   unsigned char Data;
   //先填充序号
-  Data = GetItemsPlace(TListbox_GetItems((TListboxEx_t*)pListboxEx));//占位
-  pBuf += Value2StringMin(Item + 1,pBuf,Data);//序号从1开始
+  Data = TGetItemsPlace(TListbox_GetItems((TListboxEx_t*)pListboxEx));//占位
+  pBuf += TValue2StringMin(Item + 1,pBuf,Data);//序号从1开始
   *pBuf++='.';  //1.内容
-  pBuf = pAlignString(Data + 1,pBuf);//序号对齐
+  pBuf = pTAlignString(Data + 1,pBuf);//序号对齐
   return pBuf;
 }
 
@@ -145,7 +145,7 @@ static const void *_ItemNotify(TListboxEx_t *pListboxEx,
   ItemW = strlen(pString);
   //序号占位
   if(Style & TLISTBOXEX_EN_NO)
-    ItemW += GetAlignLenR(GetItemsPlace(TListbox_GetItems((TListboxEx_t*)pListboxEx)) + 1,0);
+    ItemW += TGetAlignLenR(TGetItemsPlace(TListbox_GetItems((TListboxEx_t*)pListboxEx)) + 1,0);
 
   if(Style & TLISTBOXEX_PREFIX){//得到前缀
     pPrefix = (const char *)TGUI_NOTIFY_RUN(cbGUINotify,pListboxEx,TLISTBOXEX_NOTIFY_PREFIX,pvData);
@@ -161,7 +161,7 @@ static const void *_ItemNotify(TListboxEx_t *pListboxEx,
 
   //根据对齐方式填充内容,前面填充:
   if(Align == TLISTBOXEX_ALIIGN_CENTER)
-    ItemSpace = GetAlignLenR((W - ItemW) >> 1,0);
+    ItemSpace = TGetAlignLenR((W - ItemW) >> 1,0);
   else if(Align == TLISTBOXEX_ALIGN_LEFT)
     ItemSpace = 0;
   else if(Align == TLISTBOXEX_ALIGN_RIGHT)
@@ -169,15 +169,15 @@ static const void *_ItemNotify(TListboxEx_t *pListboxEx,
   else{// if(Align == TLISTBOXEX_ALIGN_LEN){ //项长度对齐前填充
 	  ItemSpace = TWidget_GetHPageSizeEnNotify((TWidget_t*)pListboxEx);   
     if(pListboxEx->ValidW <  ItemSpace)  //项总长小于页宽时,局中对齐
-      ItemSpace = GetAlignLenL((ItemSpace - pListboxEx->ValidW) >> 1,0);
+      ItemSpace = TGetAlignLenL((ItemSpace - pListboxEx->ValidW) >> 1,0);
     else ItemSpace = 0;
   }
   memset(pBuf,' ',ItemSpace);pBuf += ItemSpace; ItemW += ItemSpace;
 
   if(Style & TLISTBOXEX_EN_NO) pBuf = pFullNO(pListboxEx,Item,pBuf);//序号填充
-  if(Style & TLISTBOXEX_PREFIX) pBuf = strcpy_ex(pBuf,pPrefix);//填充前缀
-  pBuf = strcpy_ex(pBuf,pString);//填充内容
-  if(Style & TLISTBOXEX_SUFFIX) pBuf = strcpy_ex(pBuf,pSuffix);//填充后缀
+  if(Style & TLISTBOXEX_PREFIX) pBuf = Tstrcpy_ex(pBuf,pPrefix);//填充前缀
+  pBuf = Tstrcpy_ex(pBuf,pString);//填充内容
+  if(Style & TLISTBOXEX_SUFFIX) pBuf = Tstrcpy_ex(pBuf,pSuffix);//填充后缀
   //后空格填充
   if(W > ItemW){
     memset(pBuf,' ',W - ItemW); 

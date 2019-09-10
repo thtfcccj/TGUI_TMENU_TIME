@@ -1,9 +1,11 @@
-/* ----------------------------------------------------------------------------
- *                TMenu子菜单实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
+
+                  TMenu菜单之子菜单实现
+
+*******************************************************************************/
 #include "TMenu.h"
 #include "TMenu_SubMenu.h"
-#include "string.h"
+#include <string.h>
 
 //其中:标志定义为:
 #define _FLAG_RETURN    0x01      //置此标志认为是退出上一层
@@ -74,9 +76,15 @@ signed char TMenu_SubMenuCreate(const TMenu_t *pMenu,    //指向的菜单系统
                    TM_GetSize(pMenu),
                    strlen(TM_GetHeader(pMenu)));
   TListboxEx_SetSel(pListboxEx,Data);//当前菜单项
+  pSubMenuData->User.Sel = Data;
   
   //初始化其它数据
   pSubMenuData->Flag = 0;
+  
+  //支持RPC时，可能默认位置即需要更新RPC数据,故先通报
+  #ifdef TM_EN_RPC
+    TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_CUSOR_CHANGED, &pSubMenuData->User.Sel);
+  #endif
   
   //更新显示
   TListBoxEx_PaintAll(&pSubMenuData->ListboxEx);
@@ -97,17 +105,22 @@ signed char TMenu_SubMenuKey(const TMenu_t *pMenu,    //指向的菜单系统
   pMenu = pMenu;//防止部分编译器警告 
   PushMenu(pMenu);
   PushData(pv);
+  #ifdef TM_EN_RPC //记住上次光标位置
+    Sel = TListboxEx_GetSel(&pSubMenuData->ListboxEx); //上次位置 
+  #endif
   TListboxEx_Key(&pSubMenuData->ListboxEx,Key);//处理按键
 
   Flag = pSubMenuData->Flag;
 
-  //数字键后处理:当做快捷键处理
+  //不支持RPC时，数字键后处理:当做快捷键处理
+  #ifndef TM_EN_RPC
   if((Key >= '1') && (Key <= '9')){
     //不处理超过项目的按键
     if((Key - '1') >= TListboxEx_GetItems(&pSubMenuData->ListboxEx)) return -1;
-    pSubMenuData->User.Sel = TListboxEx_GetSel(&pSubMenuData->ListboxEx);
     Flag |= _FLAG_ENTER;
   }
+  #endif
+  pSubMenuData->User.Sel = TListboxEx_GetSel(&pSubMenuData->ListboxEx);//更新
 
   //进入指定层菜单后继处理
   if(Flag & _FLAG_ENTER){ //检查进入菜单
@@ -127,6 +140,13 @@ signed char TMenu_SubMenuKey(const TMenu_t *pMenu,    //指向的菜单系统
   //检查返回上层菜单
   if(Flag & _FLAG_RETURN)
     return -2;
+  
+  //没有进入或退出，在支持RPC时，检查选择项，若改变则通报改变以让用户层作好准备
+  #ifdef TM_EN_RPC
+    if((Sel != pSubMenuData->User.Sel) && (pSubMenuData->User.Sel < TM_GetSize(pMenu)))
+      TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_CUSOR_CHANGED, &pSubMenuData->User.Sel);
+  #endif
+  
   return -1;
 }
 

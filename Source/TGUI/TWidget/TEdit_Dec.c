@@ -1,9 +1,10 @@
-/* ----------------------------------------------------------------------------
- *                TGUI的编辑框的十进制数调整实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TWidget之编辑框-十进制数调整实现
+
+*******************************************************************************/
 #include "TEdit.h"
-#include "string.h"
+#include <string.h>
 #include "TEditPrv.h"  //内部数据,仅供内部使用
 
 //---------------------重新设定新数值函数-----------------------
@@ -58,7 +59,7 @@ static unsigned char _GetStartPos(const struct _TEdit *pEdit)
    if((pEdit->Max < 0) || (pEdit->Min > 0))
      Len++;
   }
-  MaxLen = GetNumLen(pEdit->Min,pEdit->Max);
+  MaxLen = TGetNumLen(pEdit->Min,pEdit->Max);
   if(pEdit->DotPos >= MaxLen) //<1了,得到从那位开始调整
     Len += (pEdit->DotPos - MaxLen) + 2;//0.占两位
 
@@ -80,7 +81,7 @@ static signed char _GetPreValidLen(const struct _TEdit *pEdit,
   if(pEdit->Flag & TEDIT_EN_SIGN) Pos--;//带符号
   if(!pEdit->DotPos) return Pos;
   //带小数点时,先检查数值是否<1,若是,则检查前面补了多少个0.或0.0
-  Len = GetNumLen(pEdit->Min,pEdit->Max);
+  Len = TGetNumLen(pEdit->Min,pEdit->Max);
   if(pEdit->DotPos >= Len) //<1了,0.
     Pos -= (pEdit->DotPos - Len) + 2;
   //检查当前位置在小数点左还是右边
@@ -105,7 +106,7 @@ void TEditDec_UpdateBuf(const struct _TEdit *pEdit)
   char *pPrvBuf = pBuf;
   if(Flag & TEDIT_EN_NOTIFY) *pBuf++ = '<';//带提示
   //填充数值
-  pBuf = pNum2StringFlag(pEdit->Value,pBuf,GetNumLen(pEdit->Min,pEdit->Max),
+  pBuf = pTNum2StringFlag(pEdit->Value,pBuf,TGetNumLen(pEdit->Min,pEdit->Max),
                          (Flag & TEDIT_EN_SIGN) | pEdit->DotPos);
   if(Flag & TEDIT_EN_NOTIFY) *pBuf++ = '>';//带提示
   Len = pBuf - pPrvBuf;
@@ -132,11 +133,11 @@ static void _SValueSetKeyPro(struct _TEdit *pEdit,unsigned char Key)
   TUnSigned_t Value;      //当前数值
   TUnSigned_t Muti,Vol;  //指定位置倍率与当前位值值
   if(!_SetSign(pEdit,Key)) return;//符号处理有效时直接返回
-  Value = GetAbs(pEdit->Value);
+  Value = TGetAbs(pEdit->Value);
   //得到倍率数
-  MutiPos = GetNumLen(pEdit->Min,pEdit->Max) - _GetPreValidLen(pEdit,pEdit->Pos);
-  Vol = GetDigitalInPos(Value,MutiPos);  //得到指定位数值
-  Muti = MutiTUnigned[MutiPos];
+  MutiPos = TGetNumLen(pEdit->Min,pEdit->Max) - _GetPreValidLen(pEdit,pEdit->Pos);
+  Vol = TGetDigitalInPos(Value,MutiPos);  //得到指定位数值
+  Muti = TMutiTUnigned[MutiPos];
   Value -= Vol * Muti; //去掉该位了
   if(Key == TGUI_KEY_UP){
     if(Vol < 9) Vol++;
@@ -290,7 +291,7 @@ void TEditDec(TEdit_t *pEdit,
   //计算所需长度
   Len =  253 - _GetPreValidLen(pEdit,252);//所有字符无效的填充位长度(除>)
   if(Flag & TEDIT_EN_NOTIFY) Len++;//尾部>
-  Len = GetAlignLenR(Len,GetNumLen(Min, Max));//对齐
+  Len = TGetAlignLenR(Len,TGetNumLen(Min, Max));//对齐
   pEdit->Len = Len;
   //重设置窗口高宽
   pWin = TWM_pGetWin(hWin);

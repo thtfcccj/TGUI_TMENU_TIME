@@ -1,9 +1,15 @@
-/* ----------------------------------------------------------------------------
- *                列表框扩展控件
- *因部分编译器显示方式不同,下列的窗口显示若不够清晰,请在其它文本编辑器里打开试试!
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
-//控件说明:
+                           TWidget之列表框扩展控件
+
+*******************************************************************************/
+#ifndef __T_LISTBOX_EX_H 
+#define __T_LISTBOX_EX_H
+
+/*******************************************************************************
+                                控件说明
+*******************************************************************************/
+//因部分编译器显示方式不同,下列的窗口显示若不够清晰,请在其它文本编辑器里打开试试!
 //如下所示为列表框扩展控件演示:
 //  ┌──(可选显示头)───┐
 //  │  　　1.(第一项)      ┼
@@ -27,11 +33,8 @@
 //因控件已包装好,且基类无特殊说明外(注释带★标志),
 //基类直接操作不当可能会影响系统工作,故不建议直接使用基类操作
 
-#ifndef __T_LISTBOX_EX_H 
-#define __T_LISTBOX_EX_H
-
 /**********************************************************************
-                  内部结构
+                        相关结构
 **********************************************************************/
 #include "TListbox.h"
 
@@ -99,8 +102,14 @@ TItemSize_t TListboxEx_GetItems(TListboxEx_t *pListboxEx);
 //重新设置项总数
 #define TListboxEx_SetItems(pListbox,Items)\
   TWidget_SetItems(((TWidget_t*)(pListbox)),Items)
-//★得到项宽度(含占位符)
-#define TListboxEx_GetW(pListbox) TWidget_GetW((TWidget_t*)(pListbox))
+//★得到每项首个字符的起始位置
+#define TListboxEx_GetX(pListbox) TWidget_GetX((TWidget_t*)(pListbox))     
+//★得到每项字符个数(含占位符)
+#define TListboxEx_GetW(pListbox) TWidget_GetHPageSize((TWidget_t*)(pListbox))
+//★得到项起始位置
+#define TListboxEx_GetY(pListbox) TWidget_GetY((TWidget_t*)(pListbox))  
+//★得到项高度(即一屏内显示行数)
+#define TListboxEx_GetH(pListbox) TWidget_GetVPageSize((TWidget_t*)(pListbox))      
 //判断是否有附加项
 #define TListboxEx_HaveAppend(pListbox) ((pListbox)->Style & TLISTBOXEX_EN_APPEND)
 /**********************************************************************
@@ -133,5 +142,7 @@ void TListboxEx_Key(TListboxEx_t *pListboxEx,unsigned char Key);
 const void*TListBox_Notify(void *pv,
                            unsigned char Type,
                            const void *pvData);
-#endif
+
+
+#endif //#ifndef __T_LISTBOX_EX_H 
 

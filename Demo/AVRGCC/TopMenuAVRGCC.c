@@ -6,8 +6,7 @@
 #include "TMenu_CheckBox.h"
 #include "TMenu_MNumAdj.h"
 //#include "TMenu_RadioBox.h"
-#include "TMenu_SubMenu.h"
-
+#include "TMenu_SubMenu.h
 
 #include "TMenuBase.h"
 #include "string.h"
@@ -25,8 +24,6 @@ void GetPurview(unsigned short PassWord)
     else if(PassWord == Static.PassWord)_TopMenuAVR.SubMenuAmount = 4;
     else _TopMenuAVR.SubMenuAmount = 2;
 }
-
-
 
 //============================设置菜单===========================
 #include "ARelay.h"
@@ -84,11 +81,7 @@ code TMenu_t MHandCtrl =
 
 
 //---------------------其他设置织菜单结构----------------------------
-//#include "Apublic.h"	//恢复出厂设置初始化
-//#include "APKCtrl.h"	//恢复出厂设置初始化
-#include "AInit.h"  //
-#include "AdRepair.h"	//恢复出厂设置初始化/E2AD采样补偿值
-	static PROGMEM const char LC_AC220_CH[] = {"电压: "};
+//#include "???.h"	//恢复出厂设置初始化
 
 void AC220Notify(unsigned char Type, void *pv)//顶层菜单结构函数
 {
@@ -111,7 +104,7 @@ void AC220Notify(unsigned char Type, void *pv)//顶层菜单结构函数
         default : break;
     }
 }
-//0:220v交流电压校准
+//电压校准
 code TMenu_t MAC220Set =
 {
   //菜单类型
@@ -192,117 +185,10 @@ code TMenu_t MOtherSet =
   TMENU_NOTIFY_PASS(MOtherSetNotify,TMENU_CBFUNID_NULL_MENU), //与用户空间交互的通报函数
 };
 
-
-//---------------------延时设置织菜单结构----------------------------
-static code const struct _MNumDesc DelaySetDesc[] = {
-  {MNUM_TYPE_DEC | 0, 0,250},//风门时间/s
-  {MNUM_TYPE_DEC | 0, 0,250},//动作延时/s
-  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE, 230,255},//电压上限：230-250
-  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE, 175,210},//电压下限：180-210
-  {MNUM_TYPE_DEC | 0, 0,9999},//密码
-};
-
-#include "Apublic.h"  //电压上下限,密码
-#include "APKCtrl.h"  //延时等
-void MDelaySetNotify(unsigned char Type, void *pv)//设置密码菜单结构函数
-{
-  struct _MNumAdjUser *pUser = (struct _MNumAdjUser*)pv;
-  switch(Type){
-  case TM_NOTIFY_GET_DATA://加载数据
-    pUser->Value[0] = tPKRun_T.uTimer0;
-    pUser->Value[1] = tPKRun_T.uTimer1[0];
-    pUser->Value[2] = Static.V_Hig;
-    pUser->Value[3] = Static.V_Low;
-    pUser->Value[4] = Static.PassWord;  
-    break;
-  case TM_NOTIFY_SET_DATA://保存数据
-    tPKRun_T.uTimer0 = pUser->Value[0]; 
-    tPKRun_T.uTimer1[0] = pUser->Value[1];
-    Static.V_Hig = pUser->Value[2];
-    Static.V_Low = pUser->Value[3];
-    Static.PassWord = pUser->Value[4]; 
-
-        set_bit(Sys_M_t.uSysFlag,E2WR_EN);
-        vE2WriteBlock(&tPKRun_T,
-                    E2_PKCtrl,
-                    sizeof(tPKRun_T));
-        vE2WriteBlock(&Static.PassWord,
-                    ((unsigned int)&Static.PassWord - (unsigned int)&Static + E2_Public),
-                    sizeof(Static.PassWord));
-        vE2WriteBlock(&Static.V_Hig,
-                    ((unsigned int)&Static.V_Hig - (unsigned int)&Static + E2_Public),
-                    sizeof(Static.PassWord * 2));
-        clear_bit(Sys_M_t.uSysFlag,E2WR_EN);
-    break;
-  case TM_NOTIFY_MNUM_GET_DESC://得到数值描述
-    memcpy_P(&pUser->Desc,&DelaySetDesc[pUser->CurItem],sizeof(struct _MNumDesc));
-    break;
-  default:break;
-  }
-}
-
-code TMenu_t MDelaySet =
-{
-  //菜单类型
-  TMTYPE_MNUMADJ | TM_MNUMADJ_WRITE | /*TM_MNUMADJ_LOOP_MODE | */TM_MNUMADJ_ENTER_KEY, 
-  5,              //由菜单类型决定的相关数据大小
-  {10},            //多国语言支持的菜单头字附串ID号,下标对应语种
-  2,              //自已的父菜单ID号
-  5,              //存储pv阵列的ID号(pvAryID):
-  TMENU_NOTIFY_PASS(MDelaySetNotify,TMENU_CBFUNID_NULL_MENU), //与用户空间交互的通报函数
-};
-
-
-//---------------------机组号设置织菜单结构----------------------------
-static code const struct _MNumDesc DeviceIdSetDesc[] = {
-  {MNUM_TYPE_DEC | 0, 1,99},//机组号
-};
-
-#include "global.h"//E2写标志位
-#include "Apublic.h"  //机组号,
-void MDeviceIdSetNotify(unsigned char Type, void *pv)//设置密码菜单结构函数
-{
-    struct _MNumAdjUser *pUser = (struct _MNumAdjUser*)pv;
-    switch(Type)
-    {
-    case TM_NOTIFY_GET_DATA://加载数据
-        pUser->Value[0] = Static.DeviceId;
-        break;
-    case TM_NOTIFY_SET_DATA://保存数据并存E2 
-        Static.DeviceId = pUser->Value[0];
-
-        set_bit(Sys_M_t.uSysFlag,E2WR_EN);
-        vE2WriteBlock(&Static.DeviceId,
-                    ((unsigned int)&Static.DeviceId - (unsigned int)&Static + E2_Public),
-                    sizeof(Static.DeviceId));//只能由内存写入E2
-        clear_bit(Sys_M_t.uSysFlag,E2WR_EN);
-        break;
-    case TM_NOTIFY_MNUM_GET_DESC://得到数值描述
-        memcpy_P(&pUser->Desc,&DeviceIdSetDesc[pUser->CurItem],sizeof(struct _MNumDesc));
-        break;
-    default:break;
-    }
-}
-
-code TMenu_t MDeviceIdSet =
-{
-  //菜单类型
-  TMTYPE_MNUMADJ | TM_MNUMADJ_WRITE | /*TM_MNUMADJ_LOOP_MODE | */TM_MNUMADJ_ENTER_KEY, 
-  1,              //由菜单类型决定的相关数据大小
-  {5},            //多国语言支持的菜单头字附串ID号,下标对应语种
-  2,              //自已的父菜单ID号
-  4,              //存储pv阵列的ID号(pvAryID):
-  TMENU_NOTIFY_PASS(MDeviceIdSetNotify,TMENU_CBFUNID_NULL_MENU), //与用户空间交互的通报函数
-};
-
-
-//---------------------喷漆设置织菜单结构----------------------------
+//---------------------多值调整菜单结构示例----------------------------
 static code const struct _MNumDesc SpraySetDesc[] = {
-  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE,0,50},//喷漆温度设定
-  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE, 0,80},//烤漆温度设定
-  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE, 1,10},//温差设定
-  {MNUM_TYPE_DEC | 0, 0,100},//高温保护
-  {MNUM_TYPE_DEC | 0, 1,240},//烤漆时间
+  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE,0,50},//xxxx设定
+  {MNUM_TYPE_DEC | MNUM_TYPE_GRP_MODE, 0,80},//xxxx2设定
 };
 
 #include "Apublic.h"  //喷烤温度等
@@ -313,33 +199,14 @@ void MSpraySetNotify(unsigned char Type, void *pv)//设置密码菜单结构函数
   {
     case TM_NOTIFY_GET_DATA://加载数据
         pUser->Value[0] = Static.Prt_PQ.TempSet;
-         
         pUser->Value[1] = Static.Prt_KQ.TempSet;
-        pUser->Value[2] = Static.Prt_KQ.BackTSet;
-        pUser->Value[3] = Static.Prt_KQ.HiTProtect;
-        pUser->Value[4] = Static.Prt_KQ.TimeSet; 
         break;
     case TM_NOTIFY_SET_DATA://保存数据
         Static.Prt_PQ.TempSet = pUser->Value[0];
-
         Static.Prt_KQ.TempSet = pUser->Value[1];
-        Static.Prt_KQ.BackTSet = pUser->Value[2];
-        Static.Prt_KQ.HiTProtect = pUser->Value[3];
-        Static.Prt_KQ.TimeSet = pUser->Value[4];
-
-        Static.Prt_PQ.BackTSet = Static.Prt_KQ.BackTSet;
-        Static.Prt_PQ.HiTProtect = Static.Prt_KQ.HiTProtect;
-        Static.Prt_PQ.TimeSet = Static.Prt_KQ.TimeSet;
 
         //存储E2
-        set_bit(Sys_M_t.uSysFlag,E2WR_EN);
-        vE2WriteBlock(&Static.Prt_PQ,
-                    ((unsigned int)&Static.Prt_PQ - (unsigned int)&Static + E2_Public),
-                    sizeof(Static.Prt_PQ));//只能由内存写入E2
-        vE2WriteBlock(&Static.Prt_KQ,
-                    ((unsigned int)&Static.Prt_KQ - (unsigned int)&Static + E2_Public),
-                    sizeof(Static.Prt_KQ));//只能由内存写入E2
-        clear_bit(Sys_M_t.uSysFlag,E2WR_EN); 
+
         break;
     case TM_NOTIFY_MNUM_GET_DESC://得到数值描述
         memcpy_P(&pUser->Desc,&SpraySetDesc[pUser->CurItem],sizeof(struct _MNumDesc));
@@ -352,7 +219,7 @@ code TMenu_t MSpraySet =
 {
   //菜单类型
   TMTYPE_MNUMADJ | TM_MNUMADJ_WRITE | /*TM_MNUMADJ_LOOP_MODE | */TM_MNUMADJ_ENTER_KEY, 
-  5,              //由菜单类型决定的相关数据大小
+  2,              //由菜单类型决定的相关数据大小
   {3},            //多国语言支持的菜单头字附串ID号,下标对应语种
   2,              //自已的父菜单ID号
   3,              //存储pv阵列的ID号(pvAryID):
@@ -373,7 +240,6 @@ code TMenu_t TopMenu =
 
 
 //---------------------------顶层密码菜单结构----------------------------
-//---------------------密码设置织菜单结构----------------------------
 static code const struct _MNumDesc PassWordDesc[] = {
   {MNUM_TYPE_DEC,0,9999},//密码设定范围
 };

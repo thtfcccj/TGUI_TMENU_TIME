@@ -1,13 +1,12 @@
-/* ----------------------------------------------------------------------------
- *                TGUI通用型函数
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+              以TWidget为基类的应用相关共享函数接口实现
 
-
+*******************************************************************************/
 #include "TWidgetShare.h"
-#include "string.h"
+#include <string.h>
 
-//-------------得到附加最多2项的起始位置函数---------------------
+//----------------------得到附加最多2项的起始位置函数---------------------------
 //以TWidget_t为基类的控件中,管理附加项如:"   [保  存]    [返 回] "的焦点显示
 static TItemSize_t _Append2_GetX(//0x80:在附加项里标志,0x01:带保存标志,0x02:带返回标志
                                  unsigned char Flag,
@@ -25,12 +24,12 @@ static TItemSize_t _Append2_GetX(//0x80:在附加项里标志,0x01:带保存标志,0x02:带返
   if(Flag == 0x03) 
     Len += Space;//两个按钮时
   if(ItemLen < Len) return 0;//不够显示
-  return GetAlignLenR((ItemLen - Len) >> 1,0); //对齐
+  return TGetAlignLenR((ItemLen - Len) >> 1,0); //对齐
 }
 
 
 
-//-------------附加最多2项的反显回调实现函数---------------------
+//--------------------------附加最多2项的反显回调实现函数-----------------------
 //以TWidget_t为基类的控件中,管理附加项如:"   [保  存]    [返 回] "的焦点显示
 void Append2_AutiNotify(TWidget_t *pWidget,//基类
                            //0x80:在附加项里标志,0x01:带保存标志,0x02:带返回标志
@@ -89,12 +88,12 @@ const char* Append2_GetString(TWidget_t *pWidget,//基类
   
   pBuf = TGUI_pGetBuf();       //使用共享缓冲
   memset(pBuf,' ', Pos); pBuf += Pos;   //前面填充空格
-  if(Flag & 0x01) pBuf = strcpy_ex(pBuf,p1st);//首字填充
+  if(Flag & 0x01) pBuf = Tstrcpy_ex(pBuf,p1st);//首字填充
   if(Flag == 0x03){//按键间空格
     memset(pBuf,' ', Space);  
     pBuf += Space;
   }
-  if(Flag & 0x02)pBuf = strcpy_ex(pBuf,p2nd);//末字填充
+  if(Flag & 0x02)pBuf = Tstrcpy_ex(pBuf,p2nd);//末字填充
   
   //尾空格填充
   if((TGUI_pGetBuf() + TWidget_GetW(pWidget)) > pBuf){

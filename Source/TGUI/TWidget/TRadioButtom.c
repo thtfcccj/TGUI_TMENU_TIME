@@ -1,10 +1,12 @@
-/* ----------------------------------------------------------------------------
- *                单选框控件实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
+
+                           TWidget之单选框控件实现
+
+*******************************************************************************/
 
 #include "TRadioButtom.h"
 #include "TWidgetShare.h"
-#include "string.h"
+#include <string.h>
 
 /**********************************************************************
                           行为函数
@@ -79,7 +81,7 @@ void TRadioButtom_Init(TRadioButtom_t *pRadioButtom,  //由用户分配的存储空间
    pRadioButtom->Radio = 0;
 
   //当预定义宽度比用户显示窗口宽度(即一页)小时,尽量局中对齐
-  ItemW += GetAlignLenR(GetItemsPlace(Items),1)+ 2;//序号与单选框占位
+  ItemW += TGetAlignLenR(TGetItemsPlace(Items),1)+ 2;//序号与单选框占位
 
   TListboxEx_Init((TListboxEx_t*)pRadioButtom,hWin,Items,ItemW,Flag,//基类初始化
                   Style,TGUI_NOTIFY_PASS(TRadioButtom_Notify,TGUI_CBFUNID_RADIO_BUTTON));

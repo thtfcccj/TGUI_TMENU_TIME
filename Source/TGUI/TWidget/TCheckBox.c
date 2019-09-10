@@ -1,10 +1,11 @@
-/* ----------------------------------------------------------------------------
- *                复选框控件实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TWidget之复选框控件实现
+
+*******************************************************************************/
 #include "TCheckbox.h"
-#include "string.h"
-#include "math.h"
+#include <string.h>
+#include <math.h>
 
 /**********************************************************************
                           成员函数
@@ -54,7 +55,6 @@ void TCheckbox_GetAllCheck(TCheckbox_t *pCheckbox,
 /**********************************************************************
                           行为函数
 **********************************************************************/
-
 
 //-------------------------复选框回调实现函数-----------------------------
 //仅供内部通报使用
@@ -127,7 +127,7 @@ void TCheckbox_Init(TCheckbox_t *pCheckbox,  //由用户分配的存储空间
 
   //当预定义宽度比用户显示窗口宽度(即一页)小时,尽量局中对齐
   //PageSize = TWidget_GetHPageSize((TWidget_t*)pCheckbox);
-  ItemW += GetAlignLenR(GetItemsPlace(Items),1)+ 2;//序号与复选框占位
+  ItemW += TGetAlignLenR(TGetItemsPlace(Items),1)+ 2;//序号与复选框占位
 
   TListboxEx_Init((TListboxEx_t*)pCheckbox,hWin,Items,ItemW,Flag,//基类初始化
                   Style,TGUI_NOTIFY_PASS(TCheckBox_Notify,TGUI_CBFUNID_CHECKBOX));

@@ -5,7 +5,7 @@
 **************************************************************************/
 #include "TMenuCfg.h"
 #include "TMenu.h"
-#include "string.h"
+#include <string.h>
 
 extern const TMenu_t MGetPower; //定义在code区的顶层菜单
 
@@ -25,48 +25,10 @@ do{\
 #define _GetItemLUT(pMenu) do{ }while(0)
 #endif
 
-//--------------------得到顶层菜单结构--------------------------
-//各界面顶层菜单查找表
-#include "GUI_Guide.h"
-#include "SenMenu.h"
-#include "DOutMenu.h"
-#include "MidMenu.h"
-#include "RecMenu.h"
-#include "MainMenu.h"
-#include "PowerMenu.h"
-#include "ResetMenu.h"
-#include "TestMenu.h"
-
-//各界面顶层菜单查找表,(下标为_eGUI_Guide) 
-const TMenu_t *_pTopMenu[] = {
-  &SenMenu_Top,    //传感器界面,切换键或按1键可切换至此
-  &SenMenu_Top,    //可燃筛选界面,切换键或按2键可切换至此
-  &SenMenu_Top,    //有毒筛选界面,切换键或按3键可切换至此
-  &DOutMenu_Top,    //输出界面,切换键或按4键可切换至此
-  &DOutMenu_Top,    //动作输出界面,切换键或按5键可切换至此
-  &DOutMenu_Top,    //请求界面,切换键或按6键可切换至此
-  //报警键旗下界面
-  &SenMenu_Top,    //报警界面 
-  //故障键旗下界面
-  &SenMenu_Top,    //输入故障,故障键或按*键可切换至此
-  &DOutMenu_Top,    //输出故障,故障键或按0键可切换至此
-  //菜单键旗下界面
-  &MainMenu_Top,    //菜单界面,菜单键或按*键可切换至此
-  &RecMenu_Top,    //记录界面,菜单键或按9键可切换至此  
-  //其它
-  &TestMenu_Top,    //自检界面,按8键可切换至此 
-  &PowerMenu_Top,    //用户界面,按#键可切换至此
-  &MidMenu_Top,    //中间设备界面,按7键可切换至此
-  &MidMenu_Top,    //中间设备故障界面
-};
-
 const TMenu_t *TM_pGetTopMenu(void)
 {
   //根据界面决定各顶层菜单的结构
-  const TMenu_t *pTopMenu = _pTopMenu[GUI_Guide_eGetGuide()];
-  //处理复位键
-  if((pTopMenu == &PowerMenu_Top) && ResetMenu_IsResetKey())
-    pTopMenu = &ResetMenu_GuestLogin;
+  const TMenu_t *pTopMenu = TM_pcbGetUserTopMenu();
       
   _GetItemLUT(pTopMenu); //缓存查找表
   return pTopMenu;      //指向缓存
@@ -120,7 +82,7 @@ const char *TM_GetHeader(const TMenu_t *pMenu)
 {
   char *pBuf;
   if(pMenu->pgHeader)
-    return (const char*)(pMenu->pgHeader->pLan[GetLan()]);
+    return pLanCodeToChar(pMenu->pgHeader);
 
   //菜单里没有,从用户空间获取:
   pBuf = TMenu_pGetBuf();
@@ -156,13 +118,23 @@ const char *TM_GetSubMenuHeader(const TMenu_t *pMenu,
   if(pMenu->Size & TM_TYPE_ITEM_LUT) Item = _ItemLUT[Item + 1];
   #endif
 
+  //RPC模式时,子菜单功能可能不完整, 先从用户空间获得子菜单头,若不能获取再继续
+  #ifdef TM_EN_RPC   //从完整子菜单中获取 
+    char *pBuf = TMenu_pGetBuf();
+    *pBuf = Item;
+    *(pBuf + 1) = '\0';//结束标志
+    TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_SUB_HEADER, pBuf);
+    if(*(pBuf + 1) != '\0') return pBuf; //从用户空间直接获得了
+    //否则继续
+  #endif
+  
   #ifdef TM_DYNC_MENU   //动态菜单支持时通报更新子菜单
     if(pMenu->cbNotify)
       TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_UPDATE_SUB,&Item);
   #endif
     
   pMenu = *(PAry + Item);
-  return TM_GetHeader(pMenu);
+  return TM_GetHeader(pMenu);  
 }
 
 //-------------------从菜单结构获得项字符串函数-------------------
@@ -180,7 +152,7 @@ const char *TM_GetItemString(const TMenu_t *pMenu,
       TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_UPDATE_SUB,&Item);
     #endif
     const LanCode_t *pCode = *((const LanCode_t **)(pMenu->pv) + Item);
-    return (const char*)(pCode->pLan[GetLan()]);
+    return pLanCodeToChar(pCode);
   }
 
   //从用户空间获得数据

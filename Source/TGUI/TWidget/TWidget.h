@@ -1,13 +1,15 @@
-/* ----------------------------------------------------------------------------
- *                TGUI窗口基本部件对外
-*此模块基类:TWIN(名柄)
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TWidget控件基类
+此模块基类:TWIN(名柄)
+*******************************************************************************/
 #ifndef __T_WIDGET_H 
 #define __T_WIDGET_H
 
+/*******************************************************************************
+                                控件说明
+*******************************************************************************/
 //窗口说明见TWindgetNote.h
-
 //此控件在TWin基础上构建,主要实现了的用户内容区(ItemsRect)与
 //用户内容剪切区,并根据标志具有相关的特性
 //此控件不具有与应用程序前的交互功能,需以此构件为基类,构建更高层
@@ -34,26 +36,16 @@
 //所有应用控件均以此控件为基类实现
 //显示的内容及焦点位置由继承此结构的控件实现
 
-
 /**********************************************************************
-                      配置区
-**********************************************************************/
-
-      
-/**********************************************************************
-                         关连库
+                           相关结构
 **********************************************************************/
 #include "TWM.h"     //窗口管理器
 #include "TGUIBase.h"    //基本数据
 
-/**********************************************************************
-                  内部结构
-**********************************************************************/
-
 typedef struct{
   TWinHandle_t hWin;     //所在窗口,因窗口为共享结构,故呈引用关系  
   //项区域空间,表示内内所占显示空间,在窗口内不能够显示时,将采用分页显示的方式
-  //其中x,y表示窗口向左,向坐标,w为项内容最长的值,h表示项总数
+  //其中x,y表示窗口向左,向上坐标,w为项内容最长的值,h表示项总数
   TItemsRect_t ItemsRect;
 
   TItemSize_t Sel;        //所选项
@@ -69,16 +61,20 @@ typedef struct{
 
 //★因TWidget是通过Win句柄方式间接继承TWin类,所有控件需通过下列宏实现转换:
 #define TWidget_pGetWin(pWidget) (TWM_pGetWin((pWidget)->hWin))
-//-------------------项空间操作--------------------------
+
+//-------------------项相关操作--------------------------
 //★得到当前所选
 #define TWidget_GetSel(pWidget) ((pWidget)->Sel)
 //★设置当前所选
 void TWidget_SetSel(TWidget_t *pWidget,TItemSize_t  Sel);
-//★得到项总数,即项高度
+//★得到项总数
 #define TWidget_GetItems(pWidget) ((pWidget)->ItemsRect.h)
-//设置项总数,供在控件初始化后允许使有
+//设置项总数,仅在控件初始化后允许使用
 void TWidget_SetItems(TWidget_t *pWidget,TItemSize_t Items);
-//★得到项在用户剪切区的起始位置x
+
+//---------------------项空间操作--------------------------
+//此区域包括可能的左右边框，以及保存等功能性行，不等于用户数据区
+//★得到起始位置x
 #define TWidget_GetX(pWidget) ((pWidget)->ItemsRect.x)
 //★得到项长度,即项宽度
 #define TWidget_GetW(pWidget) ((pWidget)->ItemsRect.w)
@@ -87,19 +83,20 @@ void  TWidget_SetW(TWidget_t *pWidget,TItemSize_t w);
 //★得到项在用户剪切区的起始位置y
 #define TWidget_GetY(pWidget) ((pWidget)->ItemsRect.y)
 
-//---------------用户剪切区域操作--------------------------
+//---------------用户内容剪切显示区--------------------------
+//此区域指用户数据区：
 //★得到用户剪切区绝对坐标x
 unsigned char TWidget_GetClipX(TWidget_t *pWidget);
 //★得到用户剪切区绝对坐标y
 unsigned char TWidget_GetClipY(TWidget_t *pWidget);
 //★得到水平页大小,即显示窗口宽度w 
 unsigned char TWidget_GetHPageSize(TWidget_t *pWidget);
-//得到含允许提示外的水平页大小,,即不含提示的显示窗口宽度w 
-unsigned char TWidget_GetHPageSizeEnNotify(TWidget_t *pWidget);
 //★得到垂直页大小,即显示窗口高度h
 unsigned char TWidget_GetVPageSize(TWidget_t *pWidget);
 
 //------------------------其它------------------------------
+//得到含允许提示外的水平页大小,,即不含提示的显示窗口宽度w 
+unsigned char TWidget_GetHPageSizeEnNotify(TWidget_t *pWidget);
 //★得到标志
 #define TWidget_GetFlag(pWidget) ((pWidget)->Flag)
 //★得到用户标志
@@ -108,7 +105,7 @@ unsigned char TWidget_GetVPageSize(TWidget_t *pWidget);
 void TWidget_SetUserFlag(TWidget_t *pWidget,unsigned char Flag);
 
 /**********************************************************************
-                          相关函数
+                          行为函数
 **********************************************************************/
 
 //--------------------------控制初始化函数-------------------------
@@ -125,7 +122,7 @@ void TWidget_Init(TWidget_t *pWidget,
 #define   TWIDGET_EN_HSCOLL   0x20  //允许显示水平滚动条
 #define   TWIDGET_EN_VSCOLL   0x10  //允许显示垂滚动条
 #define   TWIDGET_EN_RETURN   0x08  //允许回环标志
-#define   TWIDGET_EN_NOTIFY   0x04  //当无滚动条与边框时允许在用户空时显示提示信息
+#define   TWIDGET_EN_NOTIFY   0x04  //当无滚动条与边框时允许在用户空间显示提示信息
 //用户可自定义使用的标志区 
 #define   TWIDGET_USER       0x03
 

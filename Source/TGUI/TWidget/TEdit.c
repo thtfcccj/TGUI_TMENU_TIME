@@ -1,9 +1,9 @@
-/* ----------------------------------------------------------------------------
- *                TGUI的编辑框实现
- * --------------------------------------------------------------------------*/
+/*******************************************************************************
 
+                           TWidget之编辑框实现
+*******************************************************************************/
 #include "TEdit.h"
-#include "string.h"
+#include <string.h>
 #include "TEditPrv.h"  //内部数据,仅供内部使用
 #include "TEdit_Float.h"
 
@@ -13,24 +13,23 @@ char TEdit_GetChar(const struct _TEdit *pEdit,unsigned char Pos)
   return TWin_GetChar(TWM_pGetWin((pEdit->hWin)),Pos,0);
 }
 
-
 //-----------------------得到字符串函数----------------------------
 //此函数不适用于字符串调整模式
-const char* KEdit_pGetString(const struct _TEdit *pEdit)
+const char* TEdit_pGetString(const struct _TEdit *pEdit)
 {
   return TWin_pGetString(TWM_pGetWin(pEdit->hWin),0);
 }
 
 //----------------得到调整后的数函数--------------------
-//获得当前已调整完成的数(浮点数需使用Data2Float)转换得到
+//获得当前已调整完成的数(浮点数需使用TData2Float)转换得到
 TSigned_t TEdit_GetVolume(const TEdit_t *pEdit)
 {
   #if TGUI_EDIT_FLOAT_SUPPORT != 0
   float Value;
   if(pEdit->eType == TEditType_Float){
     Value = (float)((TSigned_t)pEdit->Value);
-    Value /= (float)MutiTUnigned[pEdit->DotPos];
-    return Float2Data(Value);
+    Value /= (float)TMutiTUnigned[pEdit->DotPos];
+    return TFloat2Data(Value);
   }
   #endif
   return pEdit->Value;

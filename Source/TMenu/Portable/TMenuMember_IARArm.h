@@ -2,11 +2,11 @@
              TMenu结构实现及相关成员操作函数在KeilC51中的实现相关
 //在原有默认结构的基础上,增加了强制多国语言支持与可选的项查找表支持
 **************************************************************************/
+#ifndef __T_MENU_MEMBER_IAR_ARM
+#define __T_MENU_MEMBER_IAR_ARM
 
-#ifndef __T_MENU_MEMBER_KEIL_C51
-#define __T_MENU_MEMBER_KEIL_C51
-
-#include "TMenuMember_Lan.h"        //强制多国语言支持
+#include "TMenuCfg.h" 
+#include "TMenuMember_Lan.h" 
 
 //根据应用,定义菜单类型如下:
 struct _TMenu{
@@ -21,9 +21,6 @@ struct _TMenu{
 /********************************************************************
                        可选的项查找表结构支持
 ********************************************************************/
-
-//为支持项内容根据系统登录用户权限决定是否显示的功能,允许增加项查找表支持
-#define   TM_EN_LUT     //是否支持查找表(内部实现使用)
 
 #ifdef TM_EN_LUT   //查找表支持时:
   //复用Size结构最高位表示该结构附有项查找表
@@ -42,14 +39,12 @@ struct _TMenu{
   //-------------------根据当前菜单查找表获得所选位置---------------------
   unsigned char TMenu_GetItemPosWithLUT(unsigned char Pos);
 
-#endif
+#endif //#ifdef TM_EN_LUT
 
 
 /********************************************************************
                        可选的动态菜单创建支持
 ********************************************************************/
-
-#define   TM_DYNC_MENU     //动态菜单支持
 
 #ifdef TM_DYNC_MENU   //动态菜单支持时:  
   
@@ -59,9 +54,16 @@ struct _TMenu{
   //更新子菜单通报 更新指字子菜单结构(pv指针指向当前子菜单的ID号)
   #define    TM_NOTIFY_USER_UPDATE_SUB    (TM_NOTIFY_USER_BASE + 2)
   
-#endif
+#endif //#ifdef TM_DYNC_MENU
 
+/********************************************************************
+                       应用层回调函数
+********************************************************************/
 
-#endif
+//-----------------------得到用户顶层菜单结构---------------------------
+const TMenu_t *TM_pcbGetUserTopMenu(void);
+  
+
+#endif //__T_MENU_MEMBER_IAR_ARM
 
 

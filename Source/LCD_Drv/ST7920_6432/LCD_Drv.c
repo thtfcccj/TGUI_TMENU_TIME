@@ -85,7 +85,7 @@ void LcdInit(unsigned char EnInitScreen)
 							           TGUI显示屏回调函数实现
 																 
 ****************************************************************************/
-#include "TGUICfg.h"
+#include "TGUIBase.h"
 
 //-------------------------更新一片区域字符函数----------------------------
 static void _UpdateString(unsigned char x,      //需要更新的行起始位置
