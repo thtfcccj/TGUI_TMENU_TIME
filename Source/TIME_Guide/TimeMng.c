@@ -188,7 +188,8 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
       if(ResumeString == 0xffff){}//内部未完成
     else{//输入字符完成时
       TImeEdit_Add(&pIme->Edit, ResumeString); //插入输入的字符
-      _ImeSelKey(pIme, _TypeGuideKey[pIme->Type]); //再次进入继续输入
+      if(pIme->Type != TIME_MNG_TYPE_NUM)//数字时允许连续
+        _ImeSelKey(pIme, _TypeGuideKey[pIme->Type]); //再次进入继续输入
     }
   }
   _Refresh(pIme);      //更新显示
