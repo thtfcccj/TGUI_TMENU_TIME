@@ -65,11 +65,6 @@ unsigned char TImeEdit_GetCursor(const struct _TImeEdit *pEdit)
   return pEdit->Cursor - pEdit->DispStart;
 }
 
-//--------------------得到光标后一位置字符函数---------------------------
-const char *TImeEdit_pGetCharInCursor(const struct _TImeEdit *pEdit)
-{
-  return  pEdit->pString + pEdit->Cursor;
-}  
     
 //---------------------------光标左移函数---------------------------
 //焦点在编辑框内时调用

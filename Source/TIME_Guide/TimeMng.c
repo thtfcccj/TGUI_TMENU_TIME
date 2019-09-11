@@ -61,7 +61,7 @@ static signed char _EditKey(struct _TImeMng *pIme,
   return 0; //0:不退出
 }
 
-//-------------------------强制退出提示模式按键实现------------------------------
+//-------------------------强制退出提示模式按键实现-----------------------------
 //返回0:不退出, 非0保存退出
 static signed char _ForceExitKey(struct _TImeMng *pIme,
                                  unsigned char GuideKey)//导航键值0-5
@@ -69,10 +69,44 @@ static signed char _ForceExitKey(struct _TImeMng *pIme,
   if(GuideKey == TIME_MNG_KEY_ENTER) return -1;//强制退出
   if(GuideKey == TIME_MNG_KEY_EXIT)//返回编辑模式
     _ChangeState(pIme, TIME_MNG_STATE_EDIT);
+  
+  //剪切板操作:粘贴
+  if(GuideKey == TIME_MNG_KEY_RIGHT){//
+    const char *pClipBuf = pIme->ClipBoard.Buf;
+    ClipBoardSizt_t StrLen = strlen(pClipBuf);
+    for(; StrLen > 0; StrLen--){
+      unsigned short Char = *pClipBuf++;
+      if(Char > 0x80){//全角时
+        Char <<= 8;
+        Char |= *pClipBuf++;
+      }
+      TImeEdit_Add(&pIme->Edit, Char);
+    }
+    return 0;//不退出
+  }
+  
+  //剪切板操作:复制相关：
+  ClipBoardSizt_t Len =  TImeEdit_GetCurLen(&pIme->Edit);  //所有
+  ClipBoardSizt_t Cursor =  TImeEdit_GetCurCursor(&pIme->Edit);
+  const char *pClipBuf = TImeEdit_pGetCurStr(&pIme->Edit);
+  if(GuideKey == TIME_MNG_KEY_UP){//复制左侧
+    Len = Cursor;
+  }
+  else if(GuideKey == TIME_MNG_KEY_DOWN){//复制右侧
+    Len -= Cursor;
+    pClipBuf += Cursor;
+  }
+    
+  if(Len){//有字符时
+    if(Len > (CLIP_BOARD_BUF_SIZE - 1)) //防止超限
+      Len = (CLIP_BOARD_BUF_SIZE - 1);
+    memcpy(pIme->ClipBoard.Buf, pClipBuf, Len);
+    pIme->ClipBoard.Buf[Len] = '\0';//强制结束字符
+  }
   return 0;//不退出  
 }
 
-//--------------------------输入法选择模式按键实现-------------------------------
+//--------------------------输入法选择模式按键实现------------------------------
 static void _ImeSelKey(struct _TImeMng *pIme,
                        unsigned char GuideKey)//导航键值0-5
 {
@@ -329,13 +363,19 @@ static const char *const _EditArrow[] = {
 };
 
 //------------------------------强制退出提示模式字符资源--------------------------
-static const char _chFourceExitMode[] = {"不保存退出吗?"};
+static const char _chFourceExitMode[] = {"[剪切板操作] 不保存退出吗?"};
 static const char _chFourceExitEnter[] = {"不保存退出"};
 static const char _chFourceExitReturn[] =  {"返回继续"};
+//剪切操作
+static const char _chCopyLeft[] =       {"复制光标前"};
+static const char _chCopyRight[] =      {"复制光标后"};
+static const char _chCopyAll[] =        {"复制所有"};
+static const char _chPease[] =          {"粘贴"};
+
 static const char *const _FourceExitArrow[] = {
-  NULL, _chFourceExitEnter,
-  NULL, NULL,
-  NULL, _chFourceExitReturn,
+  _chCopyLeft, _chFourceExitEnter,  //第一行
+  _chCopyAll, _chPease,             //第二行
+  _chCopyRight, _chFourceExitReturn,//第三行
 };
 
 //---------------------------输入法选择模式相关字符资源--------------------------

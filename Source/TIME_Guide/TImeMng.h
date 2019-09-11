@@ -33,6 +33,7 @@
 #include "TImeNum.h"
 #include "TImePinYin.h"
 #include "TImeSign.h"
+#include "ClipBoard.h"  //剪切板
 
 //用于存放各输入法内部数据结构
 union _TImeUnion{
@@ -46,9 +47,12 @@ union _TImeUnion{
 #include "TWin.h"
 #include "TImeBase.h" //TIme_String_t;
 
+
+
 struct _TImeMng{
   TWin_t *pWin;             //当前挂接的窗口
   struct _TImeEdit Edit;    //首行编辑器,含被编号字符串的相关信息
+  struct _ClipBoard ClipBoard;////剪切板
   union _TImeUnion Data;     //用于存放各输入法内部数据结构
   const char *pSignTbl;     //暂存带入的符号输入表
   
