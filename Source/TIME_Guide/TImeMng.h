@@ -97,5 +97,18 @@ void TImeMng_Task(struct _TImeMng *pIme);
 //用户输入字符确认退出后调用此函数
 void TImeMng_Quit(struct _TImeMng *pIme);
 
+/*****************************************************************************
+                            相关回调函数
+*****************************************************************************/
+
+//-----------------------------填充字符串颜色通报----------------------------
+//此函数主要为填充箭头及其字符使用，可以用于着色
+void TImeMng_cbFullStrColor(unsigned char GuideKey,//按键值
+                            unsigned char y,       //pWin内y坐标
+                             unsigned char x,       //pWin内x坐标
+                             unsigned char xLen);   //x长度
+
+
+
 #endif //#define __T_IME_MNG_H
 

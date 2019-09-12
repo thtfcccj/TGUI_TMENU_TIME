@@ -279,7 +279,7 @@ void TImeMng_Quit(struct _TImeMng *pIme)
   //  ├───────────────┤中间行
   //  │编辑模式: 　　　　　　        | 用户提示
   //  │　　　　插入 ↑ ●保存退出    | 上箭头行
-  //  │　　　左移←  →右移　        | 左右箭头行
+  //  │　　　左移←●→右移　        | 左右箭头行
   //  │　　　　删除↓ ○直接退出     | 下箭头行
   //  └───────────────┘最末行
 //起始行
@@ -293,7 +293,7 @@ static const char _UpArrowLine[] = \
   {"│           ↑●           │"};
 //左右箭头行
 static const char _LeftRightArrowLine[] = \
-  {"│         ←  →           │"};
+  {"│         ←●→           │"};
 //左右箭头行,需要字符较多时(符号输入法使用)
 static const char _LeftRightArrowLine2[] = \
   {"│          ←→            │"};
@@ -443,6 +443,7 @@ static void _FullArrowLine(struct _TImeMng *pIme,
 {
   unsigned char State = pIme->State;
   //获得左右侧字符串如："插入↑●保存退出",左: 插入   右:保存退出
+  unsigned char y = pIme->DispOffsetY + Arrow + 4; //所在行
   Arrow *= 2;
   //====================输入法模式由各子模块要对应位置字符======================
   for(unsigned char ArrowR = Arrow + 1; Arrow <= ArrowR; Arrow++){
@@ -484,11 +485,19 @@ static void _FullArrowLine(struct _TImeMng *pIme,
     if(Arrow < ArrowR){//左侧填充
       if(pRdStr != NULL){
         unsigned char StrLLen = strlen(pRdStr);
-        memcpy(pStr + (_ArrowPosLUT[Arrow] + DispOffset - StrLLen), pRdStr, StrLLen);
+        unsigned char Pos = _ArrowPosLUT[Arrow] + DispOffset - StrLLen;
+        memcpy(pStr + Pos, pRdStr, StrLLen);
+        TImeMng_cbFullStrColor(GuideKey,
+                               y, pIme->DispOffsetX + Pos, StrLLen + 2);//箭头一起
       }
     }
-    else if(pRdStr != NULL)//右侧填充
-      memcpy(pStr + _ArrowPosLUT[Arrow] - DispOffset, pRdStr, strlen(pRdStr));
+    else if(pRdStr != NULL){//右侧填充
+      unsigned char StrLLen = strlen(pRdStr);
+      unsigned char Pos = _ArrowPosLUT[Arrow] - DispOffset;
+      memcpy(pStr + Pos, pRdStr, strlen(pRdStr));
+      TImeMng_cbFullStrColor(GuideKey, 
+                             y, pIme->DispOffsetX + Pos - 2, StrLLen + 2);//箭头一起
+    }
   }
 }
 
