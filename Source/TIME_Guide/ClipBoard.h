@@ -27,7 +27,6 @@
 //剪切板定义
 struct _ClipBoard{
   char Buf[CLIP_BOARD_BUF_SIZE]; //剪切缓冲区
-  ClipBoardSizt_t ValidLen;                //已剪切区域大小,0时无定义
 };
 
 #endif //#define CLIP_BOARD

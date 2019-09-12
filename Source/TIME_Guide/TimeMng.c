@@ -67,16 +67,18 @@ static signed char _ForceExitKey(struct _TImeMng *pIme,
                                  unsigned char GuideKey)//导航键值0-5
 {
   if(GuideKey == TIME_MNG_KEY_ENTER) return -1;//强制退出
-  if(GuideKey == TIME_MNG_KEY_EXIT)//返回编辑模式
+  if(GuideKey == TIME_MNG_KEY_EXIT){//返回编辑模式
     _ChangeState(pIme, TIME_MNG_STATE_EDIT);
+    return 0;//不退出  
+  }
   
   //剪切板操作:粘贴
-  if(GuideKey == TIME_MNG_KEY_RIGHT){//
+  if(GuideKey == TIME_MNG_KEY_RIGHT){
     const char *pClipBuf = pIme->ClipBoard.Buf;
     ClipBoardSizt_t StrLen = strlen(pClipBuf);
     for(; StrLen > 0; StrLen--){
       unsigned short Char = *pClipBuf++;
-      if(Char > 0x80){//全角时
+      if(Char >= 0x80){//全角时
         Char <<= 8;
         Char |= *pClipBuf++;
       }
@@ -157,8 +159,8 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   //检查窗口是否够显示
   if(TWin_GetW(pWin) < TIME_MNG_DISP_W) return -1;//不够显示
   if(TWin_GetH(pWin) < TIME_MNG_DISP_H) return -1;//不够显示
-
-  memset(pIme, 0, sizeof(struct _TImeMng));
+  //剪切板不初始化
+  memset(pIme, 0,sizeof(struct _TImeMng) - sizeof(struct _ClipBoard)); 
   //计算显示偏移
   pIme->DispOffsetX = (TWin_GetW(pWin) - TIME_MNG_DISP_W) / 2;
   pIme->DispOffsetY = (TWin_GetH(pWin) - TIME_MNG_DISP_H) / 2;
@@ -168,6 +170,9 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
                 TIME_MNG_DISP_W - 4);  //去除前后两制表符(全角)
   pIme->pSignTbl = pSignTbl;
   pIme->TypeMask = TypeMask;
+  
+  //去除可能不需要的颜色
+  TImeMng_cbFullStrColor(0xff,0,0,TWin_GetW(pWin));
   _Refresh1st(pIme); //初始化时调用刷新固定不变不部分
   _Refresh(pIme);    //变动部分首次刷新
   return 0;
@@ -192,10 +197,16 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
   
   unsigned char State = pIme->State;
   if(State == TIME_MNG_STATE_EDIT){//编辑模式时
-    if(_EditKey(pIme,GuideKey)) return -2; //保存退出
+    if(_EditKey(pIme,GuideKey)){//保存退出
+      TImeMng_Quit(pIme);
+      return -2; 
+    }
   }
   else if(State == TIME_MNG_STATE_FORCE_EXIT){//强制退出按键
-    if(_ForceExitKey(pIme, GuideKey)) return -1;//退出键直接退出
+    if(_ForceExitKey(pIme, GuideKey)){//退出键直接退出
+      TImeMng_Quit(pIme);
+      return -1;
+    }
   }
   else if(State == TIME_MNG_STATE_SEL)//输入法选择模式
     _ImeSelKey(pIme, GuideKey);
@@ -265,7 +276,11 @@ void TImeMng_Task(struct _TImeMng *pIme)
 //用户输入字符确认退出后调用此函数
 void TImeMng_Quit(struct _TImeMng *pIme)
 {
-  TWin_Hidden(pIme->pWin);     //关闭显示
+  //去除增加的颜色
+  TImeMng_cbFullStrColor(0xfe,
+                         pIme->DispOffsetY + 4,   //pWin内y坐标,4为箭头起始行
+                         pIme->DispOffsetX,       //pWin内x坐标
+                         TIME_MNG_DISP_W);       //x长度
 }
 
 /*****************************************************************************
@@ -363,8 +378,8 @@ static const char *const _EditArrow[] = {
 };
 
 //------------------------------强制退出提示模式字符资源--------------------------
-static const char _chFourceExitMode[] = {"[剪切板操作] 不保存退出吗?"};
-static const char _chFourceExitEnter[] = {"不保存退出"};
+static const char _chFourceExitMode[] = {"剪切板操作:"};// 不保存退出吗?
+static const char _chFourceExitEnter[] = {"不保存退出!"};
 static const char _chFourceExitReturn[] =  {"返回继续"};
 //剪切操作
 static const char _chCopyLeft[] =       {"复制光标前"};

@@ -50,9 +50,9 @@ union _TImeUnion{
 
 
 struct _TImeMng{
-  TWin_t *pWin;             //当前挂接的窗口
+  TWin_t *pWin;                //当前挂接的窗口
+  //无顺序要求的：
   struct _TImeEdit Edit;    //首行编辑器,含被编号字符串的相关信息
-  struct _ClipBoard ClipBoard;////剪切板
   union _TImeUnion Data;     //用于存放各输入法内部数据结构
   const char *pSignTbl;     //暂存带入的符号输入表
   
@@ -62,6 +62,9 @@ struct _TImeMng{
   unsigned char Type;       //当前输入法类型
   unsigned char TypeMask;   //可使用的输入法类型  
   unsigned char State;       //内部工作状态，见定义:
+  
+  //最后放剪切板，以不初始化以跨区域复制
+  struct _ClipBoard ClipBoard;
 };
 
 //内部工作状态，定义为:
@@ -103,7 +106,8 @@ void TImeMng_Quit(struct _TImeMng *pIme);
 
 //-----------------------------填充字符串颜色通报----------------------------
 //此函数主要为填充箭头及其字符使用，可以用于着色
-void TImeMng_cbFullStrColor(unsigned char GuideKey,//按键值
+//形参GuideKey: 0xff开机初始化时调吸入,0xf3退出时调用，否则为按键值
+void TImeMng_cbFullStrColor(unsigned char GuideKey,//见说明
                             unsigned char y,       //pWin内y坐标
                              unsigned char x,       //pWin内x坐标
                              unsigned char xLen);   //x长度
