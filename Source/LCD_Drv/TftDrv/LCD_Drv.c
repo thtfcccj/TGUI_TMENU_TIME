@@ -28,6 +28,19 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
   const Color_t *pBrush = LCD_Drv_pcbGetBrushColor(x, y);     //取出背景颜色
   Color_t ForcusBrush = LCD_Drv_cbGetForcusBrushColor();       //取出焦点背景颜色
   unsigned char xEnd = x + w;
+  
+  #ifdef SUPPORT_LCD_DEV_RESERVE_X //保留有X区域时需修正
+    unsigned char offset = LCD_Drv_cbReviseStartX(y, x);
+    if(offset){//前面的不更新
+      x += offset;
+      pBuf++;
+      pFlagBuf++;
+      pPen++;
+      pBrush++;
+    }
+    xEnd += LCD_Drv_cbReviseEndX(y, x); //部分横坐标区域不允许更新
+  #endif
+    
   unsigned short yPixel = (unsigned short )y << 4;
   for(; x < xEnd; x++){
     char c = *pBuf;
