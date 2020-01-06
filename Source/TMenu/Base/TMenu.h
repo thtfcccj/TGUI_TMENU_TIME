@@ -140,7 +140,7 @@ const char *cbGetReturnBottom(void);
 const TMenu_t *TM_pGetTopMenu(void);
 
 //---------------------得到父菜单结构函数----------------------------
-//TMENU系统通过此结构使当前菜单指向父菜单
+//TMENU系统通过此结构使当前菜单指向父菜单,NULL表示已退出
 const TMenu_t *TM_pGetParent(const TMenu_t *pMenu);
 
 //-------------------------获得子菜单结构函数------------------------

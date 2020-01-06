@@ -21,31 +21,55 @@
 **********************************************************************/
 #include "TWM.h"    //为该模块的实例化
 
-//定义最大窗口个数,<32个
-#define       TWIN_MAX_COUNT    8  
+//定义最大窗口个数,<=64个
+#ifndef TWIN_MAX_COUNT
+  #define       TWIN_MAX_COUNT    8  
+#endif
 
 //定义窗口屏蔽位数(一位对应一行)及查找表
-#if(TWIN_MAX_COUNT > 16)
+#if(TWIN_MAX_COUNT > 32)
+  #define WinMask_t unsigned long long
+  #define WinShift2Mask(shift)  LlShift2Mask(shift) //不支持查找表
+#elif(TWIN_MAX_COUNT > 16)
   #define WinMask_t unsigned long
-  #define WinShiftLUT U32ShiftLUT
+  #ifdef U32ShiftLUT
+    #define WinShift2Mask(shift) U32ShiftLUT[shift]
+  #else
+    #define WinShift2Mask(shift) ((WinMask_t)1 << (shift))
+  #endif
 #elif(TWIN_MAX_COUNT > 8) 
   #define WinMask_t unsigned short
-  #define WinShiftLUT U16ShiftLUT
+  #ifdef U16ShiftLUT
+    #define WinShift2Mask(shift) U16ShiftLUT[shift]
+  #else
+    #define WinShift2Mask(shift) ((WinMask_t)1 << (shift))
+  #endif
 #else
   #define WinMask_t unsigned char
-  #define WinShiftLUT U8ShiftLUT
+  #define WinShift2Mask(shift) U8ShiftLUT[shift]       //仅支持查找表
 #endif
 
 //定义行屏蔽位数(一位对应一行)及查找表
-#if(TLCD_HIGH > 16)
+#if(TLCD_HIGH > 32)
+  #define RowMask_t unsigned long long
+  #define RowShift2Mask(shift)  LlShift2Mask(shift) //不支持查找表
+#elif(TLCD_HIGH > 16)
   #define RowMask_t unsigned long
-  #define RowShiftLUT U32ShiftLUT
+  #ifdef U32ShiftLUT
+    #define RowShift2Mask(shift) U32ShiftLUT[shift]
+  #else
+    #define RowShift2Mask(shift) ((RowMask_t)1 << (shift))
+  #endif
 #elif(TLCD_HIGH > 8) 
   #define RowMask_t unsigned short
-  #define RowShiftLUT U16ShiftLUT
+  #ifdef U16ShiftLUT
+    #define RowShift2Mask(shift) U16ShiftLUT[shift]
+  #else
+    #define RowShift2Mask(shift) ((RowMask_t)1 << (shift))
+  #endif
 #else
   #define RowMask_t unsigned char
-  #define RowShiftLUT U8ShiftLUT
+  #define RowShift2Mask(shift) U8ShiftLUT[shift]      //仅支持查找表
 #endif
 
 /**********************************************************************
@@ -67,6 +91,7 @@ typedef struct{
 #define		TWINMNG_CONTEXT_BUF_RDY	0x01	//行标志准备好
    
 extern TWinMng_t *pCurTWinMng;    //当前管理器
+
 /*****************************************************************************
                           行为函数
 *****************************************************************************/

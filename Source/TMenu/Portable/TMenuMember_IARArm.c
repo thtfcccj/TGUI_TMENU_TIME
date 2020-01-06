@@ -44,7 +44,7 @@ const TMenu_t *TM_pGetParent(const TMenu_t *pMenu)
    
   pMenu = pMenu->pParent;
   
-  _GetItemLUT(pMenu); //缓存查找表
+  if(pMenu != NULL) _GetItemLUT(pMenu); //没有退出菜单时， 缓存查找表
   return pMenu;
 }
 

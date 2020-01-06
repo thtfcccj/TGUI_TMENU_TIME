@@ -13,10 +13,8 @@
 
 //字符串型移位查找表(当显示屏高度<=8时才定义)
 extern const unsigned char  U8ShiftLUT[8];
-//半字型移位查找表(当显示屏高度>8时才定义)
-extern const unsigned short U16ShiftLUT[16]; 	
-//全字型移位查找表(一般不做定义)
-extern const unsigned long  U32ShiftLUT[32]; 	
+
+
 
 //----------------------TGUI所需要的临时字符串缓冲-----------------------
 extern char *TGUI_pGetBuf(void);

@@ -38,15 +38,15 @@ static unsigned char _GetUpdatedRow(void)
   unsigned char PrvUpdatedRow = pCurTWinMng->PrvUpdatedRow;
   //检查需要更新的有效行,从下行开始优先更新
   for(Row = PrvUpdatedRow + 1; Row < TLCD_HIGH; Row++){
-    if(RowUpdate & RowShiftLUT[Row]) break; 
+    if(RowUpdate & RowShift2Mask(Row)) break; 
   }
   if(Row >= TLCD_HIGH){  //回环
     for(Row = 0; Row < PrvUpdatedRow; Row++){
-      if(RowUpdate & RowShiftLUT[Row]) break; 
+      if(RowUpdate & RowShift2Mask(Row)) break; 
     }
   }
   //指出该行已更新
-  pCurTWinMng->RowUpdate = RowUpdate & (~(RowShiftLUT[Row]));
+  pCurTWinMng->RowUpdate = RowUpdate & (~(RowShift2Mask(Row)));
   pCurTWinMng->PrvUpdatedRow = Row;//指出已更新到该行
   return Row;
 }
@@ -63,7 +63,7 @@ static unsigned char _GetValidWinMask(unsigned char Row)
    //没有隐藏且在显示范围内时更新
    if((!TWin_IsHidden(pWin)) && (TWin_GetY(pWin)<= Row) && 
       ((TWin_GetY(pWin) + TWin_GetH(pWin)) > Row)){
-        ValidWinMask |= WinShiftLUT[i];
+        ValidWinMask |= WinShift2Mask(i);
     }
    pWin++;
   }
@@ -101,7 +101,7 @@ signed char TWinMng_UpdateRow(void)
     //找到最前面窗口的字符
     pWin = pCurTWinMng->pTWinAry + (WinCount - 1);
     for(i = WinCount; i > 0; i--){
-      if(ValidWinMask & WinShiftLUT[i - 1]){//有效的窗口时
+      if(ValidWinMask & WinShift2Mask(i - 1)){//有效的窗口时
         //得到该字符串,转换为相对坐标  
         Sign = TWin_GetChar(pWin,x - TWin_GetX(pWin),
                             Row - TWin_GetY(pWin));
@@ -188,7 +188,7 @@ void TWin_cbUpdateNotify(signed char x,signed char y,
   h += y;//结束位置
   if(h > TLCD_HIGH) h = TLCD_HIGH;
   for(; y < h; y++)
-    RowUpdate |= RowShiftLUT[y];
+    RowUpdate |= RowShift2Mask(y);
   pCurTWinMng->RowUpdate |= RowUpdate; //行更新标志
 }
 

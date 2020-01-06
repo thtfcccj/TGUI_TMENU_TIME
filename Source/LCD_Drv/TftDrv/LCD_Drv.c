@@ -42,6 +42,7 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
   #endif
     
   unsigned short yPixel = (unsigned short )y << 4;
+  yPixel += LCD_Drv_cbGetYpixelOffset();
   for(; x < xEnd; x++){
     char c = *pBuf;
     //当前背景色

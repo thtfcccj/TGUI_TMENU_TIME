@@ -8,6 +8,7 @@
 #define __LCD_DRV_H
 
 #include    "TftDrv.h"
+#include "TWinMng_Row.h"//RowMask_t
 
 /****************************************************************************
 							             相关配置															 
@@ -22,7 +23,11 @@
 
 //-------------------------该行是否允许更新----------------------------------
 //可用于测试模式，或某行在特定情况下当作其它用途使用
-unsigned short LCD_Drv_cbLineIsEn(unsigned char y);
+RowMask_t LCD_Drv_cbLineIsEn(unsigned char y);
+
+//-------------------------得到y轴像素偏移----------------------------------
+//可用于像素与16不对齐时情况,返回值<16
+unsigned char  LCD_Drv_cbGetYpixelOffset(void);
 
 //--------------------------修正该行起始--------------------------------------
 #ifdef SUPPORT_LCD_DEV_RESERVE_X //保留有X区域时需定义
