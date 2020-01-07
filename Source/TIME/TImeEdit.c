@@ -217,6 +217,5 @@ void TImeEdit_FullBuf(const struct _TImeEdit *pEdit,
     pBuf += Data;
     w -= Data;
   }
-  memset(pBuf, ' ', w);//填充后面的空格
 }
 

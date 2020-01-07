@@ -21,15 +21,15 @@ void TImePinYin_Init(struct _TImePinYin *pPinYin,//输入法结构
 }
 
 //----------------------填充拼音显示行字符串函数---------------------------
-//填充示例:"1pen 2ren 3sen"
-void TImePinYin_pGetPinYinChar(struct _TImePinYin *pPinYin,
-                               char *pBuf)              //被填充的字符
+//填充示例:"1pen 2ren 3sen", 返回填充数量
+unsigned char TImePinYin_GetPinYinChar(struct _TImePinYin *pPinYin,
+                                         char *pBuf)              //被填充的字符
 {
   unsigned char FindCount;
   const struct _PyIndex *const *ppPyIndex;
   unsigned char PyCount;  
   unsigned char Pos = 0; //拼音内部位置
-  char *pEndBuf = pBuf + pPinYin->DispW; //行结束位置
+  char *pEndBuf = pBuf + pPinYin->DispW;
   
   ppPyIndex = NumKeyPyIme_pGetCur(&pPinYin->Ime, &FindCount) + 
                pPinYin->PinYinStart;//指向所需索引表的有效起始位置
@@ -48,21 +48,21 @@ void TImePinYin_pGetPinYinChar(struct _TImePinYin *pPinYin,
     }
     else break; //一行显示不下下个拼音了
   }
-  if(pEndBuf > pBuf){//后面填充空格
-    memset(pBuf, ' ', pEndBuf - pBuf);
-  }
+  return (pEndBuf - pPinYin->DispW) - pBuf;
 }
 
 //----------------------填充汉字显示行字符串函数---------------------------
-//填充示例:"人1 仁2 壬3 忍4"
-void TImePinYin_pGetChChar(struct _TImePinYin *pPinYin,
-                           char *pBuf)              //被填充的字符
+//填充示例:"人1 仁2 壬3 忍4", 返回填充数量
+unsigned char TImePinYin_GetChChar(struct _TImePinYin *pPinYin,
+                                     char *pBuf)              //被填充的字符
 {
   unsigned char FindCount;
   const unsigned char *Pymb;
   unsigned char Len;
   unsigned char Pos; //汉字内部位置
   unsigned char W = (pPinYin->DispW >> 2);//每页字符个数
+  char *pStartBuf = pBuf;
+  if(W > 9) W = 9; //一页最大允许显示9个以对应数字键
   
   Pymb = (*(NumKeyPyIme_pGetCur(&pPinYin->Ime, &FindCount) + 
                pPinYin->CurPinYin))->Pymb;//指向所需拼音码表位置
@@ -78,11 +78,8 @@ void TImePinYin_pGetChChar(struct _TImePinYin *pPinYin,
       *pBuf++ = Pos + '1';//汉字提示
       *pBuf++ = ' ';//间隔 
     }
-    else{
-      memset(pBuf,' ', 4);//填充空格
-      pBuf += 4;
-    }
   }
+  return pBuf - pStartBuf;
 }
 
 //----------------------得到当前用户选择字符函数---------------------------
@@ -157,6 +154,7 @@ static void _ChSelKeyUPDown(struct _TImePinYin *pPinYin,
   unsigned char ChNextStart;
 
   W = pPinYin->DispW >> 1;//一页能显示的字符(半字为单位)个数
+  if(W > 9) W = 9; //一页最大允许显示9个以对应数字键
   if(UpFlag){//上页时
     if(!pPinYin->ChStart) return;//已在第一页了
     if(pPinYin->ChStart >= W)
@@ -196,15 +194,18 @@ extern signed char _MaxInPage_PY(struct _TImePinYin *pPinYin)
   unsigned char CurPage = 0;
   
   ppPyIndex = NumKeyPyIme_pGetCur(&pPinYin->Ime, &FindCount);//指向所需索引表的有效起始位置;得到数量
+  unsigned char Count = 0;
   while(FindCount){//还有拼音要显示时,一个个填充拼音
     PyLen += strlen((const char*)(*ppPyIndex)->Py) + 1;//前导数字占位
-    if(PyLen <= WinW){//当前页能放下
+    if((PyLen <= WinW) && (Count < 9)){//一页最大允许显示9个以对应数字键
       pPinYin->MaxPerPage[CurPage]++;//拼音个数增加
       FindCount--;
+      Count++;
       ppPyIndex++;
       PyLen++; //后导空格间隔占位
     }
     else{//页增加,为下一页初始化
+      Count = 0;
       CurPage++;
       //超限(预留一结束页为0用于判断)
       if(CurPage > (sizeof(pPinYin->MaxPerPage) - 1)){

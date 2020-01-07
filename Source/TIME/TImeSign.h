@@ -32,7 +32,7 @@ enum _eTImeSign{
 
 struct _TImeSign{
   const char *pSignTbl;  //挂接的符号输入表,全字对齐，为半字时需前面加空格补齐
-  TIme_String_t Len;     //挂接的符号输入表长度
+  unsigned short Len;     //挂接的符号输入表长度
   TIme_String_t PageStart;//标明用户所在页的字符串起始(全角为单位)位置
   unsigned char w;        //字符宽度,全角为单位,为显示宽度 / 4
   unsigned char h;        //字符高度,==显示高度
@@ -54,9 +54,10 @@ void TImeSign_Init(struct _TImeSign *pSign,//输入法结构
                    unsigned char DispH);        //显示高度>=3
 
 //----------------------填充行显示字符串函数---------------------------
-void TImeSign_pGetDispChar(struct _TImeSign *pSign,
-                           char *pBuf,              //被填充的字符
-                           unsigned char VNum);     //列号0-2
+//返回填充数量
+unsigned char TImeSign_GetDispChar(struct _TImeSign *pSign,
+                                    char *pBuf,              //被填充的字符
+                                    unsigned char VNum);     //列号0-8
 
 //------------------------判断是否选择完成函数---------------------------
 //行列均选择结束时将返回完成

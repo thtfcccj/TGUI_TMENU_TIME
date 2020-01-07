@@ -162,8 +162,10 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   //剪切板不初始化
   memset(pIme, 0,sizeof(struct _TImeMng) - sizeof(struct _ClipBoard)); 
   //计算显示偏移
-  pIme->DispOffsetX = (TWin_GetW(pWin) - TIME_MNG_DISP_W) / 2;
-  pIme->DispOffsetY = (TWin_GetH(pWin) - TIME_MNG_DISP_H) / 2;
+  if(TWin_GetW(pWin) > TIME_MNG_DISP_W)
+    pIme->DispOffsetX = (TWin_GetW(pWin) - TIME_MNG_DISP_W) / 2;
+  if(TWin_GetH(pWin)> TIME_MNG_DISP_H)
+    pIme->DispOffsetY = (TWin_GetH(pWin) - TIME_MNG_DISP_H) / 2;
   //初始化除Data区域的成员
   pIme->pWin = pWin;
   TImeEdit_Init(&pIme->Edit,pString ,Size, //初始化编辑器  
@@ -342,7 +344,6 @@ static void _Refresh1st(struct _TImeMng *pIme)
   }
   unsigned char x = pIme->DispOffsetX;
   unsigned char y = pIme->DispOffsetY;
-  //填充中部固定行
   //填充第一行
   memcpy(TWin_pGetString(pWin, y + 0) + x, _TopLine, TIME_MNG_DISP_W);  
   //填充第三行
@@ -448,7 +449,7 @@ static const unsigned char _GuideKey2TypeMask[] = {
   (1 <<TIME_MNG_TYPE_NUM),      //TIME_MNG_KEY_RIGHT
   (1 <<TIME_MNG_TYPE_LOWERCASE), //TIME_MNG_KEY_DOWN
 };
-
+01 3b 01 aa
 //------------------------------填充箭头所在行----------------------------------
 //此函数只填充一行
 static void _FullArrowLine(struct _TImeMng *pIme, 

@@ -63,14 +63,14 @@ void TImePinYin_Init(struct _TImePinYin *pPinYin,//输入法结构
                      unsigned char DispW);        //显示宽度,>16
 
 //----------------------填充拼音显示行字符串函数---------------------------
-//填充示例:"1pen 2ren 3sen"
-void TImePinYin_pGetPinYinChar(struct _TImePinYin *pPinYin,
-                               char *pBuf);              //被填充的字符
+//填充示例:"1pen 2ren 3sen", 返回填充数量
+unsigned char TImePinYin_GetPinYinChar(struct _TImePinYin *pPinYin,
+                                         char *pBuf);              //被填充的字符
 
 //----------------------填充汉字显示行字符串函数---------------------------
-//填充示例:"人1 仁2 壬3 忍4"
-void TImePinYin_pGetChChar(struct _TImePinYin *pPinYin,
-                           char *pBuf);              //被填充的字符
+//填充示例:"人1 仁2 壬3 忍4", 返回填充数量
+unsigned char TImePinYin_GetChChar(struct _TImePinYin *pPinYin,
+                                     char *pBuf);              //被填充的字符
 
 //----------------------得到当前用户选择字符函数---------------------------
 //在输入完成状态后才能调用，调用后内部状态机自动复位到空闲状态

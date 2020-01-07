@@ -36,22 +36,30 @@ void TImeSign_Init(struct _TImeSign *pSign,//输入法结构
     pSign->pSignTbl = pSignTbl;
     pSign->Len = strlen(pSignTbl);
   }
-  pSign->w = DispW >> 2; //一行全角字符   
+  DispW >>= 2; //一行全角字符;
+  if(DispW > 9) DispW = 9; //一页最大允许显示9个以对应数字键
+  pSign->w = DispW;
+  if(DispH > 9) DispH = 9; //一页最大允许显示9个以对应数字键  
   pSign->h = DispH;      //与显示高度相同
 }
 
 
 //----------------------填充行显示字符串函数---------------------------
-void TImeSign_pGetDispChar(struct _TImeSign *pSign,
-                           char *pBuf,              //被填充的字符
-                           unsigned char VNum)     //列号0-2
+//返回填充数量
+unsigned char TImeSign_GetDispChar(struct _TImeSign *pSign,
+                                    char *pBuf,              //被填充的字符
+                                    unsigned char VNum)     //列号0-8
 {
+  if(VNum > 8) VNum = 8;//异常
   const char *pPos, *pEndPos;
   unsigned short Pos;
   Pos = VNum * pSign->w * 2;//转换为半角
   Pos += pSign->PageStart;
+  if(Pos >= pSign->Len) return 0; //超了
+  
   pPos = pSign->pSignTbl + Pos; 
   pEndPos = pSign->pSignTbl + pSign->Len;
+  char *pStartBuf = pBuf;
   //填充行字符
   for(unsigned char Num = 0; Num < pSign->w; Num++){
     if(pPos < pEndPos){//字符未结束时
@@ -60,11 +68,8 @@ void TImeSign_pGetDispChar(struct _TImeSign *pSign,
       *pBuf++ = Num + '1';  //指示行位置
       *pBuf++ = ' ';        //两字符间填充空格
     }
-    else{ //字符结束时填充空白
-      memset(pBuf, ' ', 4);
-      pBuf += 4;
-    }
   }//end for
+  return pBuf - pStartBuf;
 }
 
 //----------------------得到当前用户选择字符函数---------------------------
