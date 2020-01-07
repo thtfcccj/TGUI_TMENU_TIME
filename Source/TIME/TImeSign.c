@@ -36,6 +36,11 @@ void TImeSign_Init(struct _TImeSign *pSign,//输入法结构
     pSign->pSignTbl = pSignTbl;
     pSign->Len = strlen(pSignTbl);
   }
+  //过高，及宽度够时，前面自动增加行号
+  if((DispH > 3) && (DispW > 16)){
+    pSign->EnDispLine = 1;
+    DispW -= 4; //占用显示长度了
+  }
   DispW >>= 2; //一行全角字符;
   if(DispW > 9) DispW = 9; //一页最大允许显示9个以对应数字键
   pSign->w = DispW;
@@ -59,8 +64,15 @@ unsigned char TImeSign_GetDispChar(struct _TImeSign *pSign,
   
   pPos = pSign->pSignTbl + Pos; 
   pEndPos = pSign->pSignTbl + pSign->Len;
+  
   char *pStartBuf = pBuf;
-  //填充行字符
+  if(pSign->EnDispLine){//增加行号
+    *pBuf++ = '[';
+    *pBuf++ = '1' + VNum;
+    *pBuf++ = ']';
+    *pBuf++ = ' ';
+  } 
+  //填充本行字符
   for(unsigned char Num = 0; Num < pSign->w; Num++){
     if(pPos < pEndPos){//字符未结束时
       *pBuf++ = *pPos++;    //第一个字符空格填充或前半角
@@ -68,6 +80,7 @@ unsigned char TImeSign_GetDispChar(struct _TImeSign *pSign,
       *pBuf++ = Num + '1';  //指示行位置
       *pBuf++ = ' ';        //两字符间填充空格
     }
+    else break;
   }//end for
   return pBuf - pStartBuf;
 }

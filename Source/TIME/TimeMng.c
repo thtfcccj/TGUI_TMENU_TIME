@@ -7,13 +7,23 @@
 #include <string.h>
 
 /*****************************************************************************
+                           内部宏定义
+*****************************************************************************/
+#define _BORDER_MIN_W   ((128 / 8) + 4)  //带边框最小宽度
+#define _BORDER_MIN_H   ((64 / 16) + 2)  //带边框最小高度
+
+#define _NOTE_MIN_W   (_BORDER_MIN_W + 1)  //带提示行最小宽度
+#define _NOTE_MIN_H   (_BORDER_MIN_H + 1)  //带提示行最小高度
+
+#define _SPACE_MIN_H   (_NOTE_MIN_H + 1)  //带间隔行最小高度
+
+/*****************************************************************************
                            内部函数声明
 *****************************************************************************/
 
 //---------------------------首次刷屏函数--------------------------------
 //初始化结束时先调用
 static void _Refresh1st(struct _TImeMng *pIme);
-
 
 //-------------------------得到下一个有效输入法函数---------------------------------
 //根据可用掩码切换到下一个有效输入法
@@ -212,18 +222,34 @@ static unsigned char _SwitchType(const struct _TImeMng *pIme)
   return Type; //找到了
 }
 
+//--------------------------得到有效宽度---------------------------------
+static unsigned char _GetValidW(const struct _TImeMng *pIme)
+{
+  unsigned char w = pIme->w;
+  if(w >= _BORDER_MIN_H) w -= 2; //可显示左右边界时
+  return w;
+}
+
+//--------------------------得到输入法内高度---------------------------------
+static unsigned char _GetImeH(const struct _TImeMng *pIme)
+{
+  unsigned char h = pIme->h - 1;           //编辑占一行;
+  if(h >= _SPACE_MIN_H) return h - 4;       //间隔+提示+左右边界
+  else if(h >= _SPACE_MIN_H) return h - 3; //提示+左右边界
+  if(h >= _BORDER_MIN_W) return h - 2;      //仅左右边界
+  return h;
+}
+
 //--------------------------输入法切换函数---------------------------------
 //切换到对应输入法并初始化
 static void _SwitchIme(struct _TImeMng *pIme,
                        unsigned char Type)//需切到的输入法,0-4
 {
-  unsigned char w = pIme->w;
-  if(w >= TIME_MNG_RECT_W) w -= 2; //可显示左右边界时
-  unsigned char h = pIme->h;
-  if(h >= TIME_MNG_RECT_H) h -= 2; //可显示上下边界时
+
+
   switch(Type){
   case TIME_TYPE_PINYIN:
-    TImePinYin_Init(&pIme->Data.PinYin, w);
+    TImePinYin_Init(&pIme->Data.PinYin, _GetValidW(pIme));
     break;
   case TIME_TYPE_NUM:
     TImeNum_Init(&pIme->Data.Num);
@@ -239,7 +265,7 @@ static void _SwitchIme(struct _TImeMng *pIme,
     pIme->Flag |= pIme->Type;
     TImeSign_Init(&pIme->Data.Sign, 
                   pIme->pSignTbl,
-                  w, h);
+                  _GetValidW(pIme), _GetImeH(pIme));
     break;
   }
   pIme->Type = Type;
@@ -373,22 +399,26 @@ static const char _TopLeft[] = {"┌"};
 static const char _TopRight[] = {"┐"};
 static const char _BottomLeft[] = {"└"};
 static const char _BottomRight[] = {"┘"};
+static const char _CenterLeft[] = {"├"};
+static const char _CenterRight[] = {"┤"};
 static const char *const pLeft[] = {
   _Line,
   _TopLeft,
   _BottomLeft,
+  _CenterLeft,
 };
 static const char *const pRight[] = {
   _Line,
   _TopRight,
   _BottomRight,
+  _CenterRight,
 };
 
 //-------------------------填充左右边界函数---------------------------------
 //返回填充起始边界位置
 static char* _pFullVLine(unsigned char w, char *pStr)
 {
-  if(w >= TIME_MNG_RECT_W){//可显示左右边界时
+  if(w >= _BORDER_MIN_W){//可显示左右边界时
     *pStr++ = 0xa9; //│左半
     *pStr++ = 0xa6;//│右半
     memset(pStr, ' ', w - 4);//清除中间部分
@@ -402,7 +432,7 @@ static char* _pFullVLine(unsigned char w, char *pStr)
 //返回填充起始边界位置
 static void _FullHBorder(unsigned char w,//填充总宽度
                           char *pStr,      //填充位置
-                          unsigned char BorderType)//边界类型,0中间1上2下
+                          unsigned char BorderType)//边界类型,0中间1上2下3中
 {
   //填充左边界
   memcpy(pStr, pLeft[BorderType], 2);
@@ -431,16 +461,35 @@ static void _Refresh1st(struct _TImeMng *pIme)
   unsigned char w = pIme->w;
   
   //可显示上下边界时
-  if(pIme->h >= TIME_MNG_RECT_H){
-    if(w >= TIME_MNG_RECT_W){//可显示左右边界时
+  if(pIme->h >= _BORDER_MIN_H){
+    if(w >= _BORDER_MIN_W){//可显示左右边界时
       _FullHBorder(w, TWin_pGetString(pWin, y + 0) + x, 1);
       _FullHBorder(w, TWin_pGetString(pWin, y + pIme->h - 1) + x, 2);
+      if(pIme->h >= _SPACE_MIN_H)//带间隔行时
+        _FullHBorder(w, TWin_pGetString(pWin, y + 2) + x, 3);
     }
     else{//无左右边界
       _FullHBorder(w, TWin_pGetString(pWin, y + 0) + x, 0);
       _FullHBorder(w, TWin_pGetString(pWin, y + pIme->h - 1) + x, 0);
+      if(pIme->h >= _SPACE_MIN_H)//带间隔行时
+        _FullHBorder(w, TWin_pGetString(pWin, y + 2) + x, 0);
     }
   }
+}
+
+//-----------------------------提示行填充函数--------------------------------
+static const char _ImeKeyNote[] = {"*或#键切换输入法"};//16字符
+
+
+
+//返回填充数量
+static unsigned char  _FullNote(struct _TImeMng *pIme,
+                                  char *pBuf)
+{
+  //根据输入法状态，以及可显示长度做提示！
+  
+  memcpy(pBuf, _ImeKeyNote, 16);
+  return 16;
 }
 
 //------------------刷新窗口显示函数---------------------------------
@@ -454,10 +503,10 @@ static void _Refresh(struct _TImeMng *pIme)
   unsigned char x = pIme->DispOffsetX;
   unsigned char y = pIme->DispOffsetY; //当前行
   unsigned char xColorStart = x;
-  if(w >= TIME_MNG_RECT_W){//可显示左右边界时
+  if(w >= _BORDER_MIN_W){//可显示左右边界时
     xColorStart += 2; //左边框开始
   }
-  if(h >= TIME_MNG_RECT_H){//可显示上下边界时去除
+  if(h >= _BORDER_MIN_H){//可显示上下边界时去除
     h -= 2;//去上下边框
     y += 1;//边框下一行开始
   }
@@ -477,6 +526,17 @@ static void _Refresh(struct _TImeMng *pIme)
   }
   h--; //去除首行
   y++;//到第二行了
+  if(pIme->h >= _SPACE_MIN_H){//带间隔行时不忽略此行
+    h--;
+    y++;//到下行了    
+  }
+  if(pIme->h >= _NOTE_MIN_H){//带附加提示行时填充
+    unsigned char Len = _FullNote(pIme, 
+                                  _pFullVLine(w, TWin_pGetString(pWin, y) + x));
+    TImeMng_cbFullStrColor(0xf1, y, xColorStart, 0);//附加提示行着色
+    h--;
+    y++;//到下行了    
+  }
   
   //符号输入法时，填充接下来的所有行
   if(pIme->Type == TIME_TYPE_SIGN){
@@ -487,10 +547,10 @@ static void _Refresh(struct _TImeMng *pIme)
     }
     return;
   }
-  //填充第二行:提示行: 根据当前输入法状态填充
+  //填充固定提示行: 根据当前输入法状态填充
   pBuf = _pFullVLine(w, TWin_pGetString(pWin, y) + x);
   memcpy(pBuf, _pTypeDisp[pIme->Type], 4);
-  TImeMng_cbFullStrColor(0xf0, y, xColorStart,  4);//提示行着色
+  TImeMng_cbFullStrColor(0xf0, y, xColorStart,  4);//固定提示行着色
   h--;//去除第二行  
   y++;//到第三行了
 

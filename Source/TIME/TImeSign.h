@@ -39,6 +39,7 @@ struct _TImeSign{
   enum _eTImeSign eState; //状态机
   unsigned char PosV;     //当前用户选择符号的当前面相对列位置
   unsigned char PosH;     //当前用户选择符号的当前面相对行位置
+  unsigned char EnDispLine;//允许显示行号标志
 };
 
 /*****************************************************************************

@@ -24,17 +24,14 @@
 *****************************************************************************/
 #include "TGUICfg.h"//窗口显示最大大小用户定义
 
-#define TIME_MNG_RECT_W   ((128 / 8) + 4)  //带边框最小宽度，不可修改
-#define TIME_MNG_RECT_H   ((64 / 16) + 2)  //带边框最小高度，不可修改
-
 #define TIME_CAPITAL_TIME_OV      4    //定义在符号输入法时，字符输入起时时间
 
-//TIME显示窗口显示最大大小,(不定义时为带边框最小显示单位)，注意预留边框位置(宽+4,高+2)
-#ifndef TIME_MNG_MIX_W   //定义输入法显示字符宽度,含左右边界， 需>=16,建议<=40
-  #define TIME_MNG_MIX_W    TIME_MNG_RECT_W
+//TIME显示窗口显示最大大小，注意预留边框位置(宽+4,高+2)
+#ifndef TIME_MNG_MIX_W   //定义输入法显示字符宽度,含左右边界， 需>=16,建议<=44
+  #define TIME_MNG_MIX_W    (16 + 4)  //默认为带边框最小显示单位
 #endif
-#ifndef TIME_MNG_MAX_H //定义输入法显示字符高度,含上下边界， 需>=4,建议<=10
-  #define TIME_MNG_MAX_H    TIME_MNG_RECT_H 
+#ifndef TIME_MNG_MAX_H //定义输入法显示字符高度,含上下边界， 需>=4,建议<=14
+  #define TIME_MNG_MAX_H    (4 + 2)   //默认为带边框最小显示单位 
 #endif
 
 /*****************************************************************************
@@ -130,7 +127,8 @@ void TImeMng_Quit(struct _TImeMng *pIme);
 
 //-----------------------------填充字符串颜色通报----------------------------
 //此函数主要为填充箭头及其字符使用，可以用于着色
-//形参ImeType: 0xff开机初始化时调吸入,0xf3退出时调用，0xf0: 提示行着色， 其它为输入法类型
+//形参ImeType: 0xff开机初始化时调吸入,0xf3退出时调用，
+//             0xf0: 固定提示行着色， 0xf1: 附加提示行着色, 其它为输入法类型
 void TImeMng_cbFullStrColor(unsigned char ImeType,//见说明
                             unsigned char y,       //pWin内y坐标
                              unsigned char x,       //pWin内x坐标
