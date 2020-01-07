@@ -449,7 +449,7 @@ static const unsigned char _GuideKey2TypeMask[] = {
   (1 <<TIME_MNG_TYPE_NUM),      //TIME_MNG_KEY_RIGHT
   (1 <<TIME_MNG_TYPE_LOWERCASE), //TIME_MNG_KEY_DOWN
 };
-01 3b 01 aa
+
 //------------------------------填充箭头所在行----------------------------------
 //此函数只填充一行
 static void _FullArrowLine(struct _TImeMng *pIme, 
