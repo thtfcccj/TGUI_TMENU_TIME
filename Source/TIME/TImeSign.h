@@ -66,6 +66,9 @@ unsigned char TImeSign_GetDispChar(struct _TImeSign *pSign,
 //直接宏实现为:
 #define TImeSign_IsFinal(pSign1) ((pSign1)->eState == eTImeSign_Final)
 
+//----------------------判断一页是否能显示下函数---------------------------
+signed char TImeSign_IsOnePage(const struct _TImeSign *pSign);
+
 //----------------------得到当前用户选择字符函数---------------------------
 //返回当前用户选择的字符,前两位有效
 //读取字符后强制返回空闲状态

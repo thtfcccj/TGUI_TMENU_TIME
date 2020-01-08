@@ -85,6 +85,14 @@ unsigned char TImeSign_GetDispChar(struct _TImeSign *pSign,
   return pBuf - pStartBuf;
 }
 
+//----------------------判断一页是否能显示下函数---------------------------
+signed char TImeSign_IsOnePage(const struct _TImeSign *pSign)
+{
+  unsigned short Pages = pSign->w * pSign->h * 2;//每页字符个数*2
+  if(pSign->Len <= Pages) return 1;//无下一页面
+  return 0;
+}
+         
 //----------------------得到当前用户选择字符函数---------------------------
 //返回当前用户选择的字符,前两位有效
 //读取字符后强制返回空闲状态

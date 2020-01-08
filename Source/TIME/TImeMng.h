@@ -24,6 +24,9 @@
 *****************************************************************************/
 #include "TGUICfg.h"//窗口显示最大大小用户定义
 
+//#define SUPPORT_TIME_APPEND_NOTE      //支持附加提示行时定义
+
+
 #define TIME_CAPITAL_TIME_OV      4    //定义在符号输入法时，字符输入起时时间
 
 //TIME显示窗口显示最大大小，注意预留边框位置(宽+4,高+2)
@@ -56,6 +59,7 @@
 #include "TImeNum.h"
 #include "TImePinYin.h"
 #include "TImeSign.h"
+#include "ClipBoard.h"  //剪切板
 
 //用于存放各输入法内部数据结构
 union _TImeUnion{
@@ -82,8 +86,14 @@ struct _TImeMng{
   unsigned char h;          //输入法高度(含边界),>=4,>=6时自动显示上下边界
   
   unsigned char Type;       //当前输入法类型
-  unsigned char TypeMask;   //可使用的输入法类型  
+  unsigned char TypeMask;   //可使用的输入法类型 
+  #ifdef SUPPORT_TIME_APPEND_NOTE
+    unsigned char NoteTimer;
+  #endif
   unsigned char Flag;       //相关标志,见定义
+  
+  //最后放剪切板，以不初始化以跨区域复制
+  struct _ClipBoard ClipBoard;
 };
 
 //其中,相关标志定义为:
@@ -120,7 +130,6 @@ void TImeMng_Task(struct _TImeMng *pIme);
 //用户输入字符确认退出后调用此函数
 void TImeMng_Quit(struct _TImeMng *pIme);
 
-
 /*****************************************************************************
                             相关回调函数
 *****************************************************************************/
@@ -128,7 +137,7 @@ void TImeMng_Quit(struct _TImeMng *pIme);
 //-----------------------------填充字符串颜色通报----------------------------
 //此函数主要为填充箭头及其字符使用，可以用于着色
 //形参ImeType: 0xff开机初始化时调吸入,0xf3退出时调用，
-//             0xf0: 固定提示行着色， 0xf1: 附加提示行着色, 其它为输入法类型
+//             0xf0: 固定提示行着色， 0x80~0xc1: 附加提示行着色, 其它为输入法类型
 void TImeMng_cbFullStrColor(unsigned char ImeType,//见说明
                             unsigned char y,       //pWin内y坐标
                              unsigned char x,       //pWin内x坐标

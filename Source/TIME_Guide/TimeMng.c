@@ -78,9 +78,10 @@ static signed char _ForceExitKey(struct _TImeMng *pIme,
     ClipBoardSizt_t StrLen = strlen(pClipBuf);
     for(; StrLen > 0; StrLen--){
       unsigned short Char = *pClipBuf++;
-      if(Char >= 0x80){//全角时
+      if((Char >= 0x80) && (StrLen)){//全角时
         Char <<= 8;
         Char |= *pClipBuf++;
+        StrLen--;
       }
       TImeEdit_Add(&pIme->Edit, Char);
     }

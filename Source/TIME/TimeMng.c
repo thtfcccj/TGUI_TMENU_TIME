@@ -12,10 +12,18 @@
 #define _BORDER_MIN_W   ((128 / 8) + 4)  //带边框最小宽度
 #define _BORDER_MIN_H   ((64 / 16) + 2)  //带边框最小高度
 
-#define _NOTE_MIN_W   (_BORDER_MIN_W + 1)  //带提示行最小宽度
-#define _NOTE_MIN_H   (_BORDER_MIN_H + 1)  //带提示行最小高度
+#ifdef SUPPORT_TIME_APPEND_NOTE
+  #define _NOTE_MIN_W   (_BORDER_MIN_W + 1)  //带附加提示行最小宽度
+  #define _NOTE_MIN_H   (_BORDER_MIN_H + 1)  //带附加提示行最小高度
+  #define _SPACE_MIN_H   (_NOTE_MIN_H + 1)  //带间隔行最小高度
 
-#define _SPACE_MIN_H   (_NOTE_MIN_H + 1)  //带间隔行最小高度
+  #define _NOTE_ID_COPY   3  //copy提示ID
+  #define _NOTE_ID_PASTE  4  //粘贴提示ID
+
+  static void _UpdateAppendNote(struct _TImeMng *pIme);//更新附加提示行函数
+#else
+  #define _SPACE_MIN_H   (_BORDER_MIN_H + 1)  //带间隔行最小高度
+#endif
 
 /*****************************************************************************
                            内部函数声明
@@ -78,8 +86,10 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   //检查窗口是否够显示
   if(TWin_GetW(pWin) < 16) return -1;//不够显示
   if(TWin_GetH(pWin) < 4) return -1;//不够显示
+  //剪切板不初始化
+  memset(pIme, 0,sizeof(struct _TImeMng) - sizeof(struct _ClipBoard)); 
+  pIme->ClipBoard.PrvSel = -1;//选择无效
   
-  memset(pIme, 0, sizeof(struct _TImeMng));
   //计算显示偏移
   w = TWin_GetW(pWin);
   if(w > TIME_MNG_MIX_W){
@@ -123,6 +133,45 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
     switch(Key){
     case TGUI_KEY_LEFT:  TImeEdit_CursorLeft(&pIme->Edit); break;
     case TGUI_KEY_RIGHT: TImeEdit_CursorRight(&pIme->Edit); break;
+    case TGUI_KEY_UP:{  //上键剪板板复制
+      ClipBoardSizt_t Cursor =  TImeEdit_GetCurCursor(&pIme->Edit);
+      signed short PrvSel = pIme->ClipBoard.PrvSel;
+      //非首次选择，且两交光标不同时，可复制
+      if((PrvSel >= 0) && (PrvSel != Cursor)){
+        ClipBoardSizt_t Len;
+        if(PrvSel > Cursor){//先左后右时
+          Len = PrvSel - Cursor;
+          memcpy(pIme->ClipBoard.Buf, TImeEdit_pGetCurStr(&pIme->Edit) + Cursor, Len);
+        }
+        else{//先右后左时
+          Len = Cursor - PrvSel;
+          memcpy(pIme->ClipBoard.Buf, TImeEdit_pGetCurStr(&pIme->Edit) + PrvSel, Len);            
+        }
+        pIme->ClipBoard.Buf[Len] = '\0';//强制结束字符
+      }
+      pIme->ClipBoard.PrvSel = Cursor; //强制更新至光标位置
+      #ifdef SUPPORT_TIME_APPEND_NOTE
+        pIme->NoteTimer = (0x10 * _NOTE_ID_COPY) - 1; //立即提示
+      #endif
+      break;
+    }
+    case TGUI_KEY_DOWN:{ //下键剪切板粘贴
+      const char *pClipBuf = pIme->ClipBoard.Buf;
+      ClipBoardSizt_t StrLen = strlen(pClipBuf);
+      for(; StrLen > 0; StrLen--){
+        unsigned short Char = *pClipBuf++;
+        if((Char >= 0x80) && (StrLen)){//全角时
+          Char <<= 8;
+          Char |= *pClipBuf++;
+          StrLen--;
+        }
+        TImeEdit_Add(&pIme->Edit, Char);
+      }
+      #ifdef SUPPORT_TIME_APPEND_NOTE
+        pIme->NoteTimer = (0x10 * _NOTE_ID_COPY) - 1; //立即提示
+      #endif
+      break;
+    }
     case TGUI_KEY_DELETE:TImeEdit_Clr(&pIme->Edit); break;
     case TGUI_KEY_ENTER:  return-2;//确认键退出编辑状态
     case TGUI_KEY_ESCAPE: return-1;//退出键直接退出编辑状态
@@ -158,6 +207,9 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
           _GetImeChar(pIme);
         case 3: //输入法内部退出，无效返回
           pIme->Flag &= ~TIME_FLAG_STATE;
+          #ifdef SUPPORT_TIME_APPEND_NOTE
+            pIme->NoteTimer = 0;//复位提示
+          #endif  
           //若为符号输入法退出，则强制退到进入前输入法状态
           if(pIme->Type == TIME_TYPE_SIGN)
             _SwitchIme(pIme, pIme->Flag & TIME_PRV_TYPE_MASK);
@@ -175,6 +227,13 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
 //在有输入法时调用此函数实现时间要求
 void TImeMng_Task(struct _TImeMng *pIme)
 {
+  //提示定时器
+  #ifdef SUPPORT_TIME_APPEND_NOTE
+    pIme->NoteTimer++;
+    if(!(pIme->NoteTimer & 0x0f)) _UpdateAppendNote(pIme);//2s自动更新一次提示
+  #endif
+  
+  //大小写定时器
   if(!pIme->CapitalTimer) return ;//定时器停止状态
   pIme->CapitalTimer--;
   if(pIme->CapitalTimer) return;//进行中
@@ -477,20 +536,118 @@ static void _Refresh1st(struct _TImeMng *pIme)
   }
 }
 
-//-----------------------------提示行填充函数--------------------------------
-static const char _ImeKeyNote[] = {"*或#键切换输入法"};//16字符
+//--------------------------更新附加提示行函数--------------------------------
+#ifdef SUPPORT_TIME_APPEND_NOTE
+//16个字符为最小大小，可适用于所有
 
+//编辑状态时的提示
+static const char _ImeSwitchNote[] =   {"*或#键切换输入法"};
+static const char _ImeKeyNumNote[] =   {"按数字键开始输入"};
+static const char _ImeLenNote[] =      {"注意字符长度限制"};
+static const char _ImeCopyStartNote[] ={"↑键设置复制起点"};
+static const char _ImeCopyEndNote[] =  {"移动光标↑键复制"};
+static const char _ImePasteNote[] =    {"↓键粘贴至光标处"};
+static const char _ImeNoPasteNote[] =  {"粘贴板内无内容!"};
+static const char _ImeSaveNote[] =     {"确认键保存并退出"};
+static const char _ImeExitNote[] =     {"返回键不保存退出"};
+static const char * const _ImeNote[] = {
+  _ImeSwitchNote,
+  _ImeKeyNumNote,
+  _ImeLenNote,
+  _ImeCopyEndNote,
+  _ImePasteNote,
+  _ImeSaveNote,
+  _ImeExitNote,
+};
 
+//拼单输入法提示
+static const char _PinYinEnterNote[] =  {"按确认键拼音完成"};
+static const char _PinYinPyNote[] =     {"上下键下一组拼音"};
+static const char _PinYinChNote[] =     {"上下键下一组汉字"};
+static const char * const _PinYinNote[] = {
+  _PinYinEnterNote,
+  _PinYinPyNote,
+  _PinYinChNote,
+};
 
-//返回填充数量
-static unsigned char  _FullNote(struct _TImeMng *pIme,
-                                  char *pBuf)
+//符号输入法提示
+static const char _SignSelRowPageNote[] =  {"行选,上下键翻页!"};
+static const char _SignSelRowNote[] =  {"数字键选择行!"};
+static const char _SignSelColNote[] =  {"数字键选择列!"};
+
+//其它输入法提示
+static const char _NumNote[] =     {"按数字键输入数字"};
+static const char _CapitalNote[] = {"连接按可切换字母"};
+
+static void _UpdateAppendNote(struct _TImeMng *pIme)
+                                  
 {
-  //根据输入法状态，以及可显示长度做提示！
+  if(pIme->h < _NOTE_MIN_H) return; //本次不带提示
   
-  memcpy(pBuf, _ImeKeyNote, 16);
-  return 16;
+  //找到附加提示行位置
+  unsigned char y = pIme->DispOffsetY + 1; //编辑行下面了
+  if(pIme->h >= _BORDER_MIN_H)  y++;        //可显示上下边界时 
+  if(pIme->h >= _SPACE_MIN_H) y++;          //间隔行下面了
+  char *pBuf = _pFullVLine(pIme->w, 
+                           TWin_pGetString(pIme->pWin, y) + pIme->DispOffsetX);
+  
+  const char *pStr;
+  unsigned char StrColorState;
+  if(!(pIme->Flag & TIME_FLAG_STATE)){//在编辑状态时的提示
+    StrColorState = (pIme->NoteTimer >> 4) % 6;//共6个提示
+    if(StrColorState == _NOTE_ID_COPY){//剪切板复制提示
+      if(pIme->ClipBoard.PrvSel < 0) //没有选起始呢
+        pStr = _ImeCopyStartNote;
+      else pStr = _ImeCopyEndNote;
+    }
+    else if(StrColorState == _NOTE_ID_PASTE){//剪切板粘贴提示
+      if(pIme->ClipBoard.Buf[0] == '\0') //无内容
+        pStr = _ImeNoPasteNote;
+      else pStr = _ImePasteNote;
+    }
+    else pStr = _ImeNote[StrColorState];
+    StrColorState += 0x80;
+  }
+  else{//各输入法状态内部附加提示
+    switch(pIme->Type){
+    case TIME_TYPE_PINYIN://拼音与符号输入法时
+      StrColorState = pIme->Data.PinYin.eState;
+      if(StrColorState) StrColorState--;
+      pStr = _PinYinNote[StrColorState];
+      StrColorState += 0x90;
+      break;
+    case TIME_TYPE_SIGN:
+      StrColorState = pIme->Data.Sign.eState;
+      if(!StrColorState){//首页提示
+        if(TImeSign_IsOnePage(&pIme->Data.Sign))//一页时
+          pStr = _SignSelRowNote;
+        else pStr = _SignSelRowPageNote;
+      }
+      else pStr = _SignSelColNote;//列选择提示
+      StrColorState += 0xa0;
+      break;
+    case TIME_TYPE_NUM:  //数字时
+      pStr = _NumNote;
+      StrColorState = 0xb0;
+      break;    
+    case TIME_TYPE_LOWERCASE://小写时
+      pStr = _CapitalNote;
+      StrColorState = 0xb0;      
+    case TIME_TYPE_CAPITAL://大写时
+      pStr = _CapitalNote;
+      StrColorState = 0xc0;  
+      break;
+    default: return; //异常
+    }
+  }
+  unsigned char StrLen = strlen(pStr);
+  memcpy(pBuf, pStr, StrLen); //不含结束字符
+  //附加提示行着色
+  unsigned char xColorStart = pIme->DispOffsetX;
+  if(pIme->w >= _BORDER_MIN_W) xColorStart += 2;//可显示左右边界时,左边框开始
+  TImeMng_cbFullStrColor(StrColorState, y, xColorStart, StrLen);
 }
+#endif
 
 //------------------刷新窗口显示函数---------------------------------
 //刷新pWin窗口的显示内容
@@ -530,13 +687,13 @@ static void _Refresh(struct _TImeMng *pIme)
     h--;
     y++;//到下行了    
   }
+  #ifdef SUPPORT_TIME_APPEND_NOTE
   if(pIme->h >= _NOTE_MIN_H){//带附加提示行时填充
-    unsigned char Len = _FullNote(pIme, 
-                                  _pFullVLine(w, TWin_pGetString(pWin, y) + x));
-    TImeMng_cbFullStrColor(0xf1, y, xColorStart, 0);//附加提示行着色
+    _UpdateAppendNote(pIme);
     h--;
     y++;//到下行了    
   }
+  #endif
   
   //符号输入法时，填充接下来的所有行
   if(pIme->Type == TIME_TYPE_SIGN){

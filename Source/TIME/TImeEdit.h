@@ -69,11 +69,16 @@ void TImeEdit_Init(struct _TImeEdit *pEdit,
 
 //--------------------得到相对光标位置函数---------------------------
 //即在当前显示起始开始的光标位置，用于上层焦点区反显
-unsigned char TImeEdit_GetCursor(const struct _TImeEdit *pEdit);
+TIme_String_t TImeEdit_GetCursor(const struct _TImeEdit *pEdit);
 
-//--------------------得到光标后一位置字符函数---------------------------
-const char *TImeEdit_pGetCharInCursor(const struct _TImeEdit *pEdit);
+//-----------------------得到当前光标位置 -------------------------------
+#define TImeEdit_GetCurCursor(edit)  ((edit)->Cursor)
 
+//-----------------------得到当前字符长度-------------------------------
+#define TImeEdit_GetCurLen(edit)  ((edit)->Len)
+
+//-----------------------得到当前字符-------------------------------
+#define TImeEdit_pGetCurStr(edit)  ((edit)->pString)
 
 //---------------------------光标左移函数---------------------------
 //焦点在编辑框内时调用
