@@ -14,21 +14,30 @@ struct _TGuiColor TGuiColor;
 
 //--------------------------------初始化函数----------------------------------
 //开机时调用
-void TGuiColor_Init(void)
+void TGuiColor_Init(unsigned char TitleY)//默认标题栏行位置,255表示无
 {
   //初始化结构
   memset(&TGuiColor, 0, sizeof(struct _TGuiColor));
+  TGuiColor_SetDefault(TitleY);//恢复默认配色
+}
+
+//--------------------------------置为默认函数----------------------------------
+//恢复默认配色
+void TGuiColor_SetDefault(unsigned char TitleY)
+{
   //颜色区置默认
   memset(&TGuiColor.MainPenColor,TGUI_COLOR_DEFAULT_PEN_DATA, 
          sizeof(TGuiColor.MainPenColor));
-  memset(&TGuiColor.MainPenColor, TGUI_COLOR_DEFAULT_PEN_TITLE, //标题栏 
-         TLCD_WIDTH);  
   memset(&TGuiColor.MainBrushColor, TGUI_COLOR_DEFAULT_BRUSH_DATA, 
-         sizeof(TGuiColor.MainPenColor));
-  memset(&TGuiColor.MainBrushColor, TGUI_COLOR_DEFAULT_BRUSH_TITLE, 
-         TLCD_WIDTH);  
+         sizeof(TGuiColor.MainPenColor));  
+  //标题栏
+  if(TitleY < TLCD_HIGH){
+    memset(&TGuiColor.MainPenColor[TitleY], TGUI_COLOR_DEFAULT_PEN_TITLE, 
+           TLCD_WIDTH);  
+    memset(&TGuiColor.MainBrushColor[TitleY], TGUI_COLOR_DEFAULT_BRUSH_TITLE,
+           TLCD_WIDTH);
+  }
 }
-
 
 //-------------------------------设置行坐标整体颜色函数--------------------------
 void TGuiColor_SetPenColor(unsigned char y,

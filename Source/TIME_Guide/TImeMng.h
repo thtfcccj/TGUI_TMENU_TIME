@@ -1,7 +1,7 @@
 /*****************************************************************************
 
                      TGUI上的输入法模块(导航输入法)管理器总接口
-
+此模块结构可使用共享或动态内存，不负责输入法窗口的显示与隐藏！！！
 *****************************************************************************/
 #ifndef __T_IME_MNG_H
 #define __T_IME_MNG_H
@@ -33,7 +33,6 @@
 #include "TImeNum.h"
 #include "TImePinYin.h"
 #include "TImeSign.h"
-#include "ClipBoard.h"  //剪切板
 
 //用于存放各输入法内部数据结构
 union _TImeUnion{
@@ -46,8 +45,6 @@ union _TImeUnion{
 //TIme主结构
 #include "TWin.h"
 #include "TImeBase.h" //TIme_String_t;
-
-
 
 struct _TImeMng{
   TWin_t *pWin;                //当前挂接的窗口
@@ -62,9 +59,6 @@ struct _TImeMng{
   unsigned char Type;       //当前输入法类型
   unsigned char TypeMask;   //可使用的输入法类型  
   unsigned char State;       //内部工作状态，见定义:
-  
-  //最后放剪切板，以不初始化以跨区域复制
-  struct _ClipBoard ClipBoard;
 };
 
 //内部工作状态，定义为:

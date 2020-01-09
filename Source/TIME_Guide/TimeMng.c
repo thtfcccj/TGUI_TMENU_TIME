@@ -4,6 +4,7 @@
 *****************************************************************************/
 
 #include "TImeMng.h"
+#include "ClipBoard.h"  //剪切板
 #include <string.h>
 
 /*****************************************************************************
@@ -74,7 +75,7 @@ static signed char _ForceExitKey(struct _TImeMng *pIme,
   
   //剪切板操作:粘贴
   if(GuideKey == TIME_MNG_KEY_RIGHT){
-    const char *pClipBuf = pIme->ClipBoard.Buf;
+    const char *pClipBuf = ClipBoard.Buf;
     ClipBoardSizt_t StrLen = strlen(pClipBuf);
     for(; StrLen > 0; StrLen--){
       unsigned short Char = *pClipBuf++;
@@ -103,8 +104,8 @@ static signed char _ForceExitKey(struct _TImeMng *pIme,
   if(Len){//有字符时
     if(Len > (CLIP_BOARD_BUF_SIZE - 1)) //防止超限
       Len = (CLIP_BOARD_BUF_SIZE - 1);
-    memcpy(pIme->ClipBoard.Buf, pClipBuf, Len);
-    pIme->ClipBoard.Buf[Len] = '\0';//强制结束字符
+    memcpy(ClipBoard.Buf, pClipBuf, Len);
+    ClipBoard.Buf[Len] = '\0';//强制结束字符
   }
   return 0;//不退出  
 }
@@ -160,8 +161,8 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   //检查窗口是否够显示
   if(TWin_GetW(pWin) < TIME_MNG_DISP_W) return -1;//不够显示
   if(TWin_GetH(pWin) < TIME_MNG_DISP_H) return -1;//不够显示
-  //剪切板不初始化
-  memset(pIme, 0,sizeof(struct _TImeMng) - sizeof(struct _ClipBoard)); 
+  memset(pIme, 0,sizeof(struct _TImeMng)); 
+  
   //计算显示偏移
   if(TWin_GetW(pWin) > TIME_MNG_DISP_W)
     pIme->DispOffsetX = (TWin_GetW(pWin) - TIME_MNG_DISP_W) / 2;

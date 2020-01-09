@@ -4,6 +4,7 @@
 *****************************************************************************/
 
 #include "TImeMng.h"
+#include "ClipBoard.h"  //剪切板
 #include <string.h>
 
 /*****************************************************************************
@@ -86,9 +87,9 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   //检查窗口是否够显示
   if(TWin_GetW(pWin) < 16) return -1;//不够显示
   if(TWin_GetH(pWin) < 4) return -1;//不够显示
-  //剪切板不初始化
-  memset(pIme, 0,sizeof(struct _TImeMng) - sizeof(struct _ClipBoard)); 
-  pIme->ClipBoard.PrvSel = -1;//选择无效
+  
+  memset(pIme, 0, sizeof(struct _TImeMng));
+  ClipBoard.PrvSel = -1;//选择无效
   
   //计算显示偏移
   w = TWin_GetW(pWin);
@@ -135,28 +136,28 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
     case TGUI_KEY_RIGHT: TImeEdit_CursorRight(&pIme->Edit); break;
     case TGUI_KEY_UP:{  //上键剪板板复制
       ClipBoardSizt_t Cursor =  TImeEdit_GetCurCursor(&pIme->Edit);
-      signed short PrvSel = pIme->ClipBoard.PrvSel;
+      signed short PrvSel = ClipBoard.PrvSel;
       //非首次选择，且两交光标不同时，可复制
       if((PrvSel >= 0) && (PrvSel != Cursor)){
         ClipBoardSizt_t Len;
         if(PrvSel > Cursor){//先左后右时
           Len = PrvSel - Cursor;
-          memcpy(pIme->ClipBoard.Buf, TImeEdit_pGetCurStr(&pIme->Edit) + Cursor, Len);
+          memcpy(ClipBoard.Buf, TImeEdit_pGetCurStr(&pIme->Edit) + Cursor, Len);
         }
         else{//先右后左时
           Len = Cursor - PrvSel;
-          memcpy(pIme->ClipBoard.Buf, TImeEdit_pGetCurStr(&pIme->Edit) + PrvSel, Len);            
+          memcpy(ClipBoard.Buf, TImeEdit_pGetCurStr(&pIme->Edit) + PrvSel, Len);            
         }
-        pIme->ClipBoard.Buf[Len] = '\0';//强制结束字符
+        ClipBoard.Buf[Len] = '\0';//强制结束字符
       }
-      pIme->ClipBoard.PrvSel = Cursor; //强制更新至光标位置
+      ClipBoard.PrvSel = Cursor; //强制更新至光标位置
       #ifdef SUPPORT_TIME_APPEND_NOTE
         pIme->NoteTimer = (0x10 * _NOTE_ID_COPY) - 1; //立即提示
       #endif
       break;
     }
     case TGUI_KEY_DOWN:{ //下键剪切板粘贴
-      const char *pClipBuf = pIme->ClipBoard.Buf;
+      const char *pClipBuf = ClipBoard.Buf;
       ClipBoardSizt_t StrLen = strlen(pClipBuf);
       for(; StrLen > 0; StrLen--){
         unsigned short Char = *pClipBuf++;
@@ -173,8 +174,12 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
       break;
     }
     case TGUI_KEY_DELETE:TImeEdit_Clr(&pIme->Edit); break;
-    case TGUI_KEY_ENTER:  return-2;//确认键退出编辑状态
-    case TGUI_KEY_ESCAPE: return-1;//退出键直接退出编辑状态
+    case TGUI_KEY_ENTER:  //确认键退出编辑状态
+      TImeMng_Quit(pIme);
+      return-2;
+    case TGUI_KEY_ESCAPE://退出键直接退出编辑状态
+      TImeMng_Quit(pIme);
+      return-1;
     case '*': //切换到符号输入模式,并进入其内部
       _SwitchIme(pIme, TIME_TYPE_SIGN);
       pIme->Flag |= TIME_FLAG_STATE;
@@ -227,6 +232,8 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
 //在有输入法时调用此函数实现时间要求
 void TImeMng_Task(struct _TImeMng *pIme)
 {
+  if(ClipBoard.PrvSel == -2) return; //模块无效
+  
   //提示定时器
   #ifdef SUPPORT_TIME_APPEND_NOTE
     pIme->NoteTimer++;
@@ -249,12 +256,12 @@ void TImeMng_Task(struct _TImeMng *pIme)
 //用户输入字符确认退出后调用此函数
 void TImeMng_Quit(struct _TImeMng *pIme)
 {
-  TWin_Hidden(pIme->pWin);     //关闭显示
   //去除增加的颜色
   TImeMng_cbFullStrColor(0xfe,
                          pIme->DispOffsetY,   //pWin内y坐标
                          pIme->DispOffsetX,   //pWin内x坐标
                          pIme->w);       //x长度
+  ClipBoard.PrvSel = -2;//模块无效
 }
 
 
@@ -596,12 +603,12 @@ static void _UpdateAppendNote(struct _TImeMng *pIme)
   if(!(pIme->Flag & TIME_FLAG_STATE)){//在编辑状态时的提示
     StrColorState = (pIme->NoteTimer >> 4) % 6;//共6个提示
     if(StrColorState == _NOTE_ID_COPY){//剪切板复制提示
-      if(pIme->ClipBoard.PrvSel < 0) //没有选起始呢
+      if(ClipBoard.PrvSel < 0) //没有选起始呢
         pStr = _ImeCopyStartNote;
       else pStr = _ImeCopyEndNote;
     }
     else if(StrColorState == _NOTE_ID_PASTE){//剪切板粘贴提示
-      if(pIme->ClipBoard.Buf[0] == '\0') //无内容
+      if(ClipBoard.Buf[0] == '\0') //无内容
         pStr = _ImeNoPasteNote;
       else pStr = _ImePasteNote;
     }

@@ -56,11 +56,11 @@ extern struct _TGuiColor TGuiColor;
 
 //--------------------------------初始化函数----------------------------------
 //开机时调用
-void TGuiColor_Init(void);
+void TGuiColor_Init(unsigned char TitleY);//默认标题栏行位置,255表示无
 
 //--------------------------------置为默认函数----------------------------------
-//开机时调用
-#define TGuiColor_SetDefault() do{TGuiColor_Init(); }while(0)
+//恢复默认配色
+void TGuiColor_SetDefault(unsigned char TitleY);
 
 //---------------------------允许与禁止TGUI的所有显示--------------------------
 #define TGuiColor_EnTGuiDispAll() do{TGuiColor.LcdLineEnMask = (RowMask_t)-1;}while(0)
