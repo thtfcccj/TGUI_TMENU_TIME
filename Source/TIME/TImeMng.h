@@ -136,7 +136,7 @@ void TImeMng_Quit(struct _TImeMng *pIme);
 
 //-----------------------------填充字符串颜色通报----------------------------
 //此函数主要为填充箭头及其字符使用，可以用于着色
-//形参ImeType: 0xff开机初始化时调吸入,0xf3退出时调用，
+//形参ImeType: 0xff开机初始化时调吸入,0xfe退出时调用，
 //             0xf0: 固定提示行着色， 0x80~0xc1: 附加提示行着色, 其它为输入法类型
 void TImeMng_cbFullStrColor(unsigned char ImeType,//见说明
                             unsigned char y,       //pWin内y坐标
