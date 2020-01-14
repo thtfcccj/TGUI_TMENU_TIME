@@ -38,7 +38,7 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
       pPen++;
       pBrush++;
     }
-    xEnd += LCD_Drv_cbReviseEndX(y, x); //部分横坐标区域不允许更新
+    xEnd -= LCD_Drv_cbReviseEndX(y, xEnd); //部分横坐标区域不允许更新
   #endif
     
   unsigned short yPixel = (unsigned short )y << 4;

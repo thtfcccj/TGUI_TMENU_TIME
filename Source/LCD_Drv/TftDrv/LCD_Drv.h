@@ -40,7 +40,7 @@ unsigned char LCD_Drv_cbReviseStartX(unsigned char y, //所在行
 #ifdef SUPPORT_LCD_DEV_RESERVE_X //保留有X区域时需定义
 //返回往前偏移字符个数
 unsigned char LCD_Drv_cbReviseEndX(unsigned char y, //所在行
-                                      unsigned char StartX);//起始位置
+                                      unsigned char EndX);//结束位置
 #endif
   
 //-------------------------得到指定位置文字颜色信息流--------------------------
