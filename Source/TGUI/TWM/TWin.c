@@ -22,8 +22,15 @@ void TWin_InitWin(TWin_t *pWin,       //需初始化的窗口
   pWin->Rect.w = w;
   pWin->Rect.h = h;
   pWin->pBuf = pBuf;
-  memset(pBuf,' ',sizeof(TWin_t));  //初始化为空
+  memset(pBuf,' ',BufSize);  //初始化为空
   pWin->BufSize = BufSize;
+}
+  
+//-------------------------★清除缓冲区数据--------------------------
+//用空格填充缓冲区
+void TWin_ClrBuf(TWin_t *pWin)
+{
+  memset(pWin->pBuf,' ',pWin->BufSize);
 }
 
 //-------------------------设置标志函数----------------------------
@@ -35,8 +42,6 @@ static void _SetFlag(TWin_t *pWin,unsigned char Flag)
                       pWin->Rect.w,
                       pWin->Rect.h);//需要更新整个显示区
 }
-
-
 
 //-------------------------窗口隐藏函数----------------------------
 void TWin_Hidden(TWin_t *pWin)
@@ -93,7 +98,6 @@ char TWin_GetChar(TWin_t *pWin,signed char x,signed char y)
 {
  return *(pWin->pBuf + pWin->Rect.w * y + x);
 }
-
 
 //-------------------------更新一行字符函数----------------------------
 //当字符串不够时,后面将清为0,当字符串过多时,后面将不会显示

@@ -30,7 +30,7 @@
 #endif
 //默认列表标题背景色
 #ifndef TGUI_COLOR_DEFAULT_BRUSH_TITLE
-  #define   TGUI_COLOR_DEFAULT_BRUSH_TITLE   RGB666666   //灰色
+  #define   TGUI_COLOR_DEFAULT_BRUSH_TITLE   RGB333333   //深灰色
 #endif
 //焦点区背景色
 #ifndef TGUI_COLOR_DEFAULT_BRUSH_FOCUS

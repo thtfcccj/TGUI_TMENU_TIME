@@ -71,6 +71,10 @@ void TWin_InitWin(TWin_t *pWin,       //需初始化的窗口
                   char *pBuf,       //缓冲区
                   unsigned short BufSize);//缓冲区大小
 
+//-------------------------★清除缓冲区数据--------------------------
+//用空格填充缓冲区
+void TWin_ClrBuf(TWin_t *pWin);
+
 //-------------------------★窗口隐藏函数----------------------------
 void TWin_Hidden(TWin_t *pWin);
 
