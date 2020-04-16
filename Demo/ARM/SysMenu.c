@@ -30,7 +30,7 @@ void *TMenu_pGetBuf(void){
 }
 
 /**********************************************************************
-                         TGUI中未实现的回调函数
+                         TGUI中部分未实现的回调函数
 **********************************************************************/
 //----------------------得到常量缓存结构函数-----------------------
 //因某些单片机不支持code区指针,故在内核已避免了code区指针问题,
@@ -40,29 +40,6 @@ extern char *TGUI_pGetConstBuf(void)
 {
   return _ConstBuf;
 }
-
-//----------------------得到保存按钮字-----------------------
-static const char LC_Save_Ch[]={"[ 确定 ]"};
-//static const char LC_Enter_Ch[]={"[ 进入 ]"};
-
-//#include "MenuResorce.h"
-
-const char *cbGetSaveBottom(void)
-{
-  const TMenu_t *pMenu = pTMenu_GetCurMenu();
-  //if((pMenu == &MGetPower) || (pMenu == &MSelPoint))
-  //  return LC_Enter_Ch;
-  return LC_Save_Ch;
-}
-
-//----------------------得到返回按钮字-----------------------
-static const char LC_Exit_Ch[]={"[ 退出 ]"};
-
-const char *cbGetReturnBottom(void)
-{
-  return LC_Exit_Ch;
-}
-
 
 /*/-------------------------显示屏更新一行内容函数--------------------
 void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏

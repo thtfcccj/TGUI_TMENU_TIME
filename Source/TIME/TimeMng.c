@@ -292,7 +292,7 @@ static unsigned char _SwitchType(const struct _TImeMng *pIme)
 static unsigned char _GetValidW(const struct _TImeMng *pIme)
 {
   unsigned char w = pIme->w;
-  if(w >= _BORDER_MIN_H) w -= 2; //可显示左右边界时
+  if(w >= _BORDER_MIN_W) w -= 4; //可显示左右边界时
   return w;
 }
 

@@ -152,7 +152,8 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
   pDotBuf = TRowDotBuf_pGetBuf(w,pBuf,pFlagBuf);
   //应用相关：倒数第二行上划虚线
   if(y == 6){
-    if((GUI_Guide_eGetGuide() != eGUI_Guide_User) && 
+    if(TWin_IsHidden(TMenu_pGetTWin(TM_hGetMenuWin())) && //菜单没显示时才有虚线
+       (GUI_Guide_eGetGuide() != eGUI_Guide_User) && 
        (GUI_Guide_eGetGuide() != eGUI_Guide_Menu) && 
         (GUI_Guide_eGetGuide() != eGUI_Guide_Test) &&  
           !((GUI_Guide_eGetGuide() == eGUI_Guide_Rec) && (RecMenu.RecType == 0xff))){

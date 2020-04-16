@@ -61,7 +61,7 @@
 #define TM_MEDITSEL_DIS_GRP_SAVE (0x02 << TMTYPE_USER_SHIFT)
 //注：群保存模式需用户在应用层自已缓存需修改或保存的数据,这里只起
 //通知的作用
-#define TM_MEDITSEL_GRP_SAVE  (0x02 << TMTYPE_USER_SHIFT)   
+#define TM_MEDITSEL_GRP_SAVE  (0x04 << TMTYPE_USER_SHIFT)   
 
 /**********************************************************************
                         用户区数据结构
