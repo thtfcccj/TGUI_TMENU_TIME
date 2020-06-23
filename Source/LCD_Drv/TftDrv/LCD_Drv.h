@@ -7,7 +7,12 @@
 #ifndef __LCD_DRV_H
 #define __LCD_DRV_H
 
-#include    "TftDrv.h"
+#ifdef SUPPORT_EX_VFB
+  #include "TftDbi.h"
+#else
+  #include "TftDrv.h"
+#endif
+
 #include "TWinMng_Row.h"//RowMask_t
 
 /****************************************************************************
