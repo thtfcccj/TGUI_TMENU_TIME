@@ -22,6 +22,8 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
                          //每个字符对应位置标志,见定义
                          const unsigned char *pFlagBuf)
 {
+  if(LCD_Drv_cbIsTest()) return;     //测试状态更新屏幕由外部实现
+  
   if(!LCD_Drv_cbLineIsEn(y)) return; //行不允许更新时
   
   const Color_t *pPen = LCD_Drv_pcbGetPenColor(x, y);         //取出文字颜色
