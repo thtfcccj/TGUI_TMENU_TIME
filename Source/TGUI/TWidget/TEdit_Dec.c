@@ -182,7 +182,7 @@ static void _SKeyPro(struct _TEdit *pEdit,unsigned char Key)
   case '-': _SetSign(pEdit,Key); break;
   case TGUI_KEY_UP:
   case TGUI_KEY_DOWN:
-    _SValueSetKeyPro(pEdit,Key);
+    if(_SetSign(pEdit,Key)) _SValueSetKeyPro(pEdit,Key);
     break;
   case TGUI_KEY_ENTER:
     if(!(pEdit->Flag & TEDIT_ENTER_RIGHT)){//Õý³£ÍË³ö
