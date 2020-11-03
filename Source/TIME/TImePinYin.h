@@ -47,6 +47,7 @@ struct _TImePinYin{
   unsigned char CurCh;        //当前选择的汉字索引位置,半字为单位
 
   unsigned char CurPage;       //拼音选择时当前页位置
+  unsigned char CurPinYingCount;//当前拼音数量
   unsigned char MaxPerPage[9]; //拼音选择时每页最大数量:从1开始
   
   

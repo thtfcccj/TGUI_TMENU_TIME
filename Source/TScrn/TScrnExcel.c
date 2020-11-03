@@ -189,9 +189,9 @@ void TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,
 {
   const struct _TScrnExcelData *pData = pExcel->pData;
   unsigned short Line;
-  if(pData->AryIdToLine == NULL) Line = AryId; //对应关系
+  if(pData->AryIdToLine == NULL) Line = AryId; //不支持时，则一一对应
   else Line = pData->AryIdToLine(pData, AryId);
-  if(Line >= TScrnExcel_GetItemCount(pExcel)) return;//异常
+  if(Line >= TScrnExcel_GetItemCount(pExcel)) return;//异常(不支持时不在此页)或暂未执行
 
   //置光标并更新当前位置
   TListboxEx_SetSel(&pExcel->TListboxEx, Line);

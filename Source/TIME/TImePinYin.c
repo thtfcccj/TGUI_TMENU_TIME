@@ -153,8 +153,8 @@ static void _ChSelKeyUPDown(struct _TImePinYin *pPinYin,
   unsigned char W;
   unsigned char ChNextStart;
 
-  W = pPinYin->DispW >> 1;//一页能显示的字符(半字为单位)个数
-  if(W > 9) W = 9; //一页最大允许显示9个以对应数字键
+  W = pPinYin->DispW;//一页能显示的字符个数
+  if(W > 18) W = 18; //一页最大允许显示9个以对应数字键(半字为单位)
   if(UpFlag){//上页时
     if(!pPinYin->ChStart) return;//已在第一页了
     if(pPinYin->ChStart >= W)
@@ -183,9 +183,8 @@ static void _ChSelKeyNum(struct _TImePinYin *pPinYin,
   }
 }
 
-//------------------------拼音选择时页及项数量计算---------------------------
-//返回：0正确    -1错误
-extern signed char _MaxInPage_PY(struct _TImePinYin *pPinYin)
+//-----------------拼音选择前更新每页能够容纳的拼音数量-------------------------
+extern void _UpdateMaxPerPage(struct _TImePinYin *pPinYin)
 {
   unsigned char FindCount;
   const struct _PyIndex *const *ppPyIndex;
@@ -193,8 +192,10 @@ extern signed char _MaxInPage_PY(struct _TImePinYin *pPinYin)
   unsigned char WinW = pPinYin->DispW; //得到窗口宽度
   unsigned char CurPage = 0;
   
+  memset(pPinYin->MaxPerPage, 0, sizeof(sizeof(pPinYin->MaxPerPage)));//先清为0
   ppPyIndex = NumKeyPyIme_pGetCur(&pPinYin->Ime, &FindCount);//指向所需索引表的有效起始位置;得到数量
   unsigned char Count = 0;
+  pPinYin->CurPinYingCount = FindCount;
   while(FindCount){//还有拼音要显示时,一个个填充拼音
     PyLen += strlen((const char*)(*ppPyIndex)->Py) + 1;//前导数字占位
     if((PyLen <= WinW) && (Count < 9)){//一页最大允许显示9个以对应数字键
@@ -204,18 +205,14 @@ extern signed char _MaxInPage_PY(struct _TImePinYin *pPinYin)
       ppPyIndex++;
       PyLen++; //后导空格间隔占位
     }
-    else{//页增加,为下一页初始化
+    else{//页增加,为下一页重新初始化
       Count = 0;
       CurPage++;
-      //超限(预留一结束页为0用于判断)
-      if(CurPage > (sizeof(pPinYin->MaxPerPage) - 1)){
-        return -1; //错误返回
-      }
-      pPinYin->MaxPerPage[CurPage] = 0;
+      //拼音容量数量超限了，不再填入
+      if(CurPage > (sizeof(pPinYin->MaxPerPage) - 1)) return;
       PyLen = 0;//保留当前拼音长度到下页
     }
   }
-  return 0;
 }
 
 //=============================按键响应函数================================
@@ -240,8 +237,11 @@ enum _eTImePinYin TImePinYin_eKey(struct _TImePinYin *pPinYin,
     break;
   case eTImePinYin_Input://拼音输入状态
     if((KeyNum == TGUI_KEY_ENTER) || (KeyNum == TGUI_KEY_RIGHT)){//确认拼音输入完成时
-      if(!_MaxInPage_PY(pPinYin))//计算页数量和每页个数
+      _UpdateMaxPerPage(pPinYin); //更新每页个数
+      if(pPinYin->CurPinYingCount > 1)//需要拼音选择时
         eState = eTImePinYin_PinYinSel;//切换到拼音选择状态
+      else //只有一个拼音时直接确认
+        eState = eTImePinYin_ChSel;   //直接到汉字选择状态      
     }
     else{//响应拼音输入法
       //用户按清除键清除完成后，重新到空闲状态
@@ -270,8 +270,12 @@ enum _eTImePinYin TImePinYin_eKey(struct _TImePinYin *pPinYin,
       _ChSelKeyNum(pPinYin, KeyNum - '1');
       eState = eTImePinYin_Final;//切换到完成状态
     }
-    else if(KeyNum == ' ')//退出键退至拼音选择状态
-      eState = eTImePinYin_PinYinSel;
+    else if(KeyNum == ' '){//退出键
+      if(pPinYin->CurPinYingCount > 1)//需要拼音选择时
+        eState = eTImePinYin_PinYinSel;//退出到到拼音选择状态
+      else //只有一个拼音时直接上级
+        eState = eTImePinYin_Input;   //退出键退至拼音输入状态 
+    }
     break;
   default: break; //保持当前状态不变
   }

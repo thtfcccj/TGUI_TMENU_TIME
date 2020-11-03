@@ -20,6 +20,9 @@
 
   #define _NOTE_ID_COPY   3  //copy提示ID
   #define _NOTE_ID_PASTE  4  //粘贴提示ID
+  #define _NOTE_ID_NSAVE  5  //不保存提示ID
+  #define _NOTE_ID_SAVE   6  //保存提示ID
+  #define _NoteId2Timer(id) ((0x10 * (id)) - 1) //提示转时间
 
   static void _UpdateAppendNote(struct _TImeMng *pIme);//更新附加提示行函数
 #else
@@ -152,7 +155,7 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
       }
       ClipBoard.PrvSel = Cursor; //强制更新至光标位置
       #ifdef SUPPORT_TIME_APPEND_NOTE
-        pIme->NoteTimer = (0x10 * _NOTE_ID_COPY) - 1; //立即提示
+        pIme->NoteTimer = _NoteId2Timer(_NOTE_ID_COPY); //立即提示
       #endif
       break;
     }
@@ -169,7 +172,7 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
         TImeEdit_Add(&pIme->Edit, Char);
       }
       #ifdef SUPPORT_TIME_APPEND_NOTE
-        pIme->NoteTimer = (0x10 * _NOTE_ID_COPY) - 1; //立即提示
+        pIme->NoteTimer = _NoteId2Timer(_NOTE_ID_COPY); //立即提示
       #endif
       break;
     }
@@ -203,6 +206,7 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
     }
   }
   else{//在输入法内部时
+    
     switch(_KeyInType(pIme, Key)){
         //case 0:break;// 0未响应
         case 1: //1:输入法内部不退出，有结果返回
@@ -210,10 +214,15 @@ signed char TImeMng_Key(struct _TImeMng *pIme,
           break;
         case 2: //输入法内部退出，有结果返回
           _GetImeChar(pIme);
+          #ifdef SUPPORT_TIME_APPEND_NOTE
+            pIme->NoteTimer = _NoteId2Timer(_NOTE_ID_SAVE); //立即提示保存退出
+          #endif  
+          //继续
         case 3: //输入法内部退出，无效返回
           pIme->Flag &= ~TIME_FLAG_STATE;
           #ifdef SUPPORT_TIME_APPEND_NOTE
-            pIme->NoteTimer = 0;//复位提示
+            if(pIme->NoteTimer != _NoteId2Timer(_NOTE_ID_SAVE))//不是保存退出时
+              pIme->NoteTimer = 0;//复位提示
           #endif  
           //若为符号输入法退出，则强制退到进入前输入法状态
           if(pIme->Type == TIME_TYPE_SIGN)
@@ -555,22 +564,23 @@ static const char _ImeCopyStartNote[] ={"↑键设置复制起点"};
 static const char _ImeCopyEndNote[] =  {"移动光标↑键复制"};
 static const char _ImePasteNote[] =    {"↓键粘贴至光标处"};
 static const char _ImeNoPasteNote[] =  {"粘贴板内无内容!"};
-static const char _ImeSaveNote[] =     {"确认键保存并退出"};
 static const char _ImeExitNote[] =     {"返回键不保存退出"};
+static const char _ImeSaveNote[] =     {"确认键保存并退出"};
+
 static const char * const _ImeNote[] = {
   _ImeSwitchNote,
   _ImeKeyNumNote,
   _ImeLenNote,
   _ImeCopyEndNote,
   _ImePasteNote,
-  _ImeSaveNote,
-  _ImeExitNote,
+  _ImeExitNote,  
+  _ImeSaveNote, //放最后
 };
 
 //拼单输入法提示
-static const char _PinYinEnterNote[] =  {"按确认键拼音完成"};
-static const char _PinYinPyNote[] =     {"上下键下一组拼音"};
-static const char _PinYinChNote[] =     {"上下键下一组汉字"};
+static const char _PinYinEnterNote[] =  {"确认键拼音完成"};
+static const char _PinYinPyNote[] =     {"1-9键,↑↓翻页"};
+static const char _PinYinChNote[] =     {"1-9键,↑↓翻页"};
 static const char * const _PinYinNote[] = {
   _PinYinEnterNote,
   _PinYinPyNote,
@@ -578,13 +588,13 @@ static const char * const _PinYinNote[] = {
 };
 
 //符号输入法提示
-static const char _SignSelRowPageNote[] =  {"行选,上下键翻页!"};
-static const char _SignSelRowNote[] =  {"数字键选择行!"};
-static const char _SignSelColNote[] =  {"数字键选择列!"};
+static const char _SignSelRowPageNote[] =  {"行选,↑↓翻页!"};
+static const char _SignSelRowNote[] =  {"1-9键选择行!"};
+static const char _SignSelColNote[] =  {"1-9键选择列!"};
 
 //其它输入法提示
-static const char _NumNote[] =     {"按数字键输入数字"};
-static const char _CapitalNote[] = {"连接按可切换字母"};
+static const char _NumNote[] =     {"0-9键输入数字"};
+static const char _CapitalNote[] = {"连接按切换字母"};
 
 static void _UpdateAppendNote(struct _TImeMng *pIme)
                                   
@@ -601,7 +611,7 @@ static void _UpdateAppendNote(struct _TImeMng *pIme)
   const char *pStr;
   unsigned char StrColorState;
   if(!(pIme->Flag & TIME_FLAG_STATE)){//在编辑状态时的提示
-    StrColorState = (pIme->NoteTimer >> 4) % 6;//共6个提示
+    StrColorState = (pIme->NoteTimer >> 4) % (sizeof(_ImeNote) / 4);//提示个数
     if(StrColorState == _NOTE_ID_COPY){//剪切板复制提示
       if(ClipBoard.PrvSel < 0) //没有选起始呢
         pStr = _ImeCopyStartNote;
