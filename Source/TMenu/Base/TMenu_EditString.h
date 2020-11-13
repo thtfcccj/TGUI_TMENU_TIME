@@ -26,9 +26,9 @@
 //typedef struct _TMenu{
 //  TMTYPE_EDITSTRING;        //菜单类型为字符编辑模式
 //  unsigned char Size;       //项大小这里不使用，定义为0即可
-//  LanguageCode_t *pgHeader; //菜单头这里无用
+//  LanguageCode_t *pgHeader; //菜单头
 //  struct _TMenu *pParent;   //自已的父菜单
-//  const char*;              //用于存放挂接的符号表，具本见TImeMng定义
+//  const char*;              //用于存放挂接的符号表，NULL默认，具本见TImeMng定义
 //  TMenuNotify_t Notify;     //与用户空间交互的通报函数
 //}TMenu_t;
 
