@@ -150,6 +150,9 @@ void TWinMng_UpdateLcd(void)
   if(!(pCurTWinMng->Flag & TWINMNG_CONTEXT_BUF_RDY)) return;//行数据未准备好
   
   //最左侧为全角字时检查左全角字是否被截掉，若是则填充空
+  //->注意这里直接使用TLCD_WIDTH全局检查(未回调)，若应用中使用的可能不是全屏功能
+  //  将超出检查范围，（未回调时）的解决方案为：
+  //   在不是全屏功能的应用中，调整TGUI显示范围的同时，将未用缓冲区清为空格或0
   if(pCurTWinMng->RowBuf[0] >= 0x80){
    for(unsigned char i = 1; i < TLCD_WIDTH; i++){
      if(pCurTWinMng->RowBuf[i] < 0x80){

@@ -226,6 +226,7 @@ static signed char _EnterMenu(struct _TMenuMng *pMng,
   //创建当前菜单,为防止常量不可移值性问题,直接使用case:
   //_Oprate[Type].Create(pCurMenu,TM_hGetMenuWin(),
   //                      Data,&pMng->vData);
+  memset(&pMng->vData, 0, sizeof(union _MenuDataPv));//使用前初始化
   switch(Type){
   #ifndef TMENU_DIS_SUBMENU
   case TMTYPE_SUBMENU://子菜单模式
