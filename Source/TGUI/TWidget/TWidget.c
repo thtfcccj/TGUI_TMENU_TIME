@@ -331,23 +331,34 @@ unsigned int TWidget_Key(TWidget_t *pWidget,unsigned char Key)
     return TGUI_PAINT_VCONTEXT | TGUI_PAINT_FOCUS;
   } 
   default:{
-    if((Key >= '1') && (Key <= '9')){
-      TWidget_SetSel(pWidget, Key - '1');
-      //确保能够显示所选项
-      Sel = TWidget_GetSel(pWidget);
-      if(PrvSel == Sel) break;
-      //选项改变时
-      PrvSel = pWidget->ItemsRect.y;//暂存
-      if(Sel < PrvSel){
-        pWidget->ItemsRect.y = Sel;
-      }
-      else{
-        PrvSel += TWidget_GetDispH(pWin,Flag);
-        if(Sel >= PrvSel)//在下面页时显示在最后一行
-         pWidget->ItemsRect.y = PrvSel;
-      }
-      return TGUI_PAINT_VCONTEXT | TGUI_PAINT_FOCUS;
+    if((Key >= '1') && (Key <= '9'))//处理1~9键
+      Sel = Key - '1';
+    else if(Key == '*'){ //本页内减10行   
+      if(PrvSel < 10) Sel = 0;//不够减了在第一行
+      else Sel = PrvSel - 10;
     }
+    else if(Key == '#'){ //本页内加10行   
+      Sel = PrvSel + 10;
+      PageSize = TWidget_GetDispH(pWin,Flag);
+      if(Sel >= PageSize) Sel = PageSize - 1;//不够加了在最后一行
+    }
+    else return 0;//其它按键不处理
+    //Sel更新
+    TWidget_SetSel(pWidget,Sel);     
+    //确保能够显示所选项
+    Sel = TWidget_GetSel(pWidget);
+    if(PrvSel == Sel) break;
+    //选项改变时
+    PrvSel = pWidget->ItemsRect.y;//暂存
+    if(Sel < PrvSel){
+      pWidget->ItemsRect.y = Sel;
+    }
+    else{
+      PrvSel += TWidget_GetDispH(pWin,Flag);
+      if(Sel >= PrvSel)//在下面页时显示在最后一行
+       pWidget->ItemsRect.y = PrvSel;
+    }
+    return TGUI_PAINT_VCONTEXT | TGUI_PAINT_FOCUS;
   }
   }
   return 0;

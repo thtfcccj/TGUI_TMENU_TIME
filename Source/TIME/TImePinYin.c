@@ -48,7 +48,7 @@ unsigned char TImePinYin_GetPinYinChar(struct _TImePinYin *pPinYin,
     }
     else break; //一行显示不下下个拼音了
   }
-  return (pEndBuf - pPinYin->DispW) - pBuf;
+  return pBuf - (pEndBuf - pPinYin->DispW);
 }
 
 //----------------------填充汉字显示行字符串函数---------------------------

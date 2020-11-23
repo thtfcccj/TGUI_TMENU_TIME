@@ -33,9 +33,9 @@ void TGuiColor_SetDefault(unsigned char TitleY)
   //标题栏
   if(TitleY < TLCD_HIGH){
     memset(&TGuiColor.MainPenColor[TitleY], TGUI_COLOR_DEFAULT_PEN_TITLE, 
-           TLCD_WIDTH);  
+           TLCD_WIDTH);  //Color_t=1byte时
     memset(&TGuiColor.MainBrushColor[TitleY], TGUI_COLOR_DEFAULT_BRUSH_TITLE,
-           TLCD_WIDTH);
+           TLCD_WIDTH);//Color_t=1byte时
   }
 }
 
@@ -45,7 +45,7 @@ void TGuiColor_SetPenColor(unsigned char y,
                         unsigned char xLen,
                         Color_t Color)
 {
-  memset(&TGuiColor.MainPenColor[y][x], Color, xLen);
+  memset(&TGuiColor.MainPenColor[y][x], Color, xLen);//Color_t=1byte时
 }
 
 //-------------------------------设置行坐标对应颜色函数--------------------------
@@ -54,7 +54,7 @@ void TGuiColor_SetPenColorP(unsigned char y,
                         unsigned char xLen,
                         const Color_t *pColor)
 {
-  memcpy(&TGuiColor.MainPenColor[y][x], pColor,xLen);  
+  memcpy(&TGuiColor.MainPenColor[y][x], pColor,xLen);  //Color_t=1byte时
 }
 
 /****************************************************************************

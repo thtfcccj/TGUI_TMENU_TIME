@@ -726,7 +726,7 @@ static void _Refresh(struct _TImeMng *pIme)
   memcpy(pBuf, _pTypeDisp[pIme->Type], 4);
   TImeMng_cbFullStrColor(0xf0, y, xColorStart,  4);//固定提示行着色
   h--;//去除第二行  
-  y++;//到第三行了
+  y++;//到编辑器内部了(第三行)
 
   //填充编辑器内部: 由具体模块完成填充或补充
   if(pIme->Flag & TIME_FLAG_STATE){
@@ -735,17 +735,18 @@ static void _Refresh(struct _TImeMng *pIme)
       enum _eTImePinYin ePinYin = TImePinYin_eGetState(&pIme->Data.PinYin);
       if((ePinYin >= eTImePinYin_Input) && (ePinYin <= eTImePinYin_ChSel)){
         memcpy(pBuf + 4, _pPinYinTypeDisp[ePinYin - 1], 10);
-        TImeMng_cbFullStrColor(TIME_TYPE_PINYIN, y, xColorStart + 4,  10);//提示行着色
+        //TImeMng_cbFullStrColor(0xf0, y - 1 , xColorStart + 4,  10);//提示行默认色即可
       }
+      
       unsigned char Len;
       //内部行更新      
       Len = TImePinYin_GetPinYinChar(&pIme->Data.PinYin, 
                                        _pFullVLine(w, TWin_pGetString(pWin, y) + x));
-      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN, y, xColorStart,  Len);//由用户处理可支持分别着色
+      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | (0 << 3), y, xColorStart,  Len);//由用户处理可支持分别着色
       y++;//到第四行了
       Len = TImePinYin_GetChChar(&pIme->Data.PinYin,
                             _pFullVLine(w, TWin_pGetString(pWin, y) + x));
-      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN, y, xColorStart,  Len);//由用户处理可支持分别着色
+      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | (1 << 3), y, xColorStart,  Len);//由用户处理可支持分别着色
       h -= 2; //已填充数量
       y++;//到第五行了
     }
