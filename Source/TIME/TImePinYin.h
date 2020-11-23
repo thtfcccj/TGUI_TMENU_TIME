@@ -50,6 +50,9 @@ struct _TImePinYin{
   unsigned char CurPinYingCount;//当前拼音数量
   unsigned char MaxPerPage[9]; //拼音选择时每页最大数量:从1开始
   
+  unsigned char CurPinYinStrStart;//当前拼音字符起始位置
+  unsigned char CurPinYinStrCount;//当前拼音字符个数  
+  
   
   enum _eTImePinYin eState;  //状态机
 };

@@ -37,6 +37,12 @@ unsigned char TImePinYin_GetPinYinChar(struct _TImePinYin *pPinYin,
   while(FindCount){//还有拼音要显示时,一个个填充拼音
     PyCount = strlen((const char*)(*ppPyIndex)->Py);//拼音
     if((PyCount + 1) <= (pEndBuf - pBuf)){//数字+拼音填充,直到拼音显示不下时为止
+      //当前拼音字符位置时，缓冲此项以备用
+      if(Pos == pPinYin->CurPinYin){
+        pPinYin->CurPinYinStrStart = pBuf - (pEndBuf - pPinYin->DispW);
+        pPinYin->CurPinYinStrCount =  PyCount + 1; //含序号提示       
+      }
+      //准备字符
       *pBuf++ = Pos + '1'; //拼音前提示
       memcpy(pBuf, (*ppPyIndex)->Py, PyCount);
       pBuf += PyCount;   

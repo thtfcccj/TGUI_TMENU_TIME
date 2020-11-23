@@ -35,12 +35,24 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
     unsigned char offset = LCD_Drv_cbReviseStartX(y, x);
     if(offset){//前面的不更新
       x += offset;
-      pBuf++;
-      pFlagBuf++;
-      pPen++;
-      pBrush++;
+      pBuf += offset;
+      pFlagBuf += offset;
+      pPen += offset;
+      pBrush += offset;
     }
     xEnd -= LCD_Drv_cbReviseEndX(y, xEnd); //部分横坐标区域不允许更新
+    
+    ///最左侧为全角字时检查左全角字是否被截掉，在这里检查
+    if(*pBuf >= 0x80){
+      unsigned char Len = xEnd - x;
+      const char *pCurBuf = pBuf + 1;
+      for(unsigned char i = 1; i < Len; i++, pCurBuf++){
+        if(*pCurBuf < 0x80){//末尾了
+          if(i & 0x01) *(char *)pBuf = ' ';
+          break;
+        }
+      }
+    }
   #endif
     
   unsigned short yPixel = (unsigned short )y << 4;

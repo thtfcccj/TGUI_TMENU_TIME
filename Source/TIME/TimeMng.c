@@ -717,7 +717,11 @@ static void _Refresh(struct _TImeMng *pIme)
     for(unsigned char VNum = 0; VNum  < h; VNum++, y++){
       unsigned char Len = TImeSign_GetDispChar(&pIme->Data.Sign, 
                               _pFullVLine(w, TWin_pGetString(pWin, y) + x), VNum);
-      TImeMng_cbFullStrColor(TIME_TYPE_SIGN, y, xColorStart,  Len);//由用户处理可支持分别着色
+      unsigned char Mode; //行被选择了
+      if((VNum == pIme->Data.Sign.PosV) && (pIme->Data.Sign.eState == eTImeSign_SelV))
+        Mode = TIME_TYPE_SIGN | 0x10;
+      else Mode = TIME_TYPE_SIGN | 0;
+      TImeMng_cbFullStrColor(Mode, y, xColorStart,  Len);//由用户处理可支持分别着色
     }
     return;
   }
@@ -735,18 +739,26 @@ static void _Refresh(struct _TImeMng *pIme)
       enum _eTImePinYin ePinYin = TImePinYin_eGetState(&pIme->Data.PinYin);
       if((ePinYin >= eTImePinYin_Input) && (ePinYin <= eTImePinYin_ChSel)){
         memcpy(pBuf + 4, _pPinYinTypeDisp[ePinYin - 1], 10);
-        //TImeMng_cbFullStrColor(0xf0, y - 1 , xColorStart + 4,  10);//提示行默认色即可
+        TImeMng_cbFullStrColor(0xf1, y - 1 , xColorStart + 4,  10);//独立提示行
       }
-      
       unsigned char Len;
-      //内部行更新      
+      //内部行更新：拼音选择行    
       Len = TImePinYin_GetPinYinChar(&pIme->Data.PinYin, 
                                        _pFullVLine(w, TWin_pGetString(pWin, y) + x));
-      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | (0 << 3), y, xColorStart,  Len);//由用户处理可支持分别着色
-      y++;//到第四行了
+      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | (0 << 3), y, xColorStart, Len);
+      //汉字选择时，着色被选择的拼音
+      unsigned char ChSel;
+      if(pIme->Data.PinYin.eState == eTImePinYin_ChSel){
+        TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | (1 << 3), y, 
+                               xColorStart + pIme->Data.PinYin.CurPinYinStrStart, 
+                               pIme->Data.PinYin.CurPinYinStrCount);
+        ChSel = (3 << 3);
+      }
+      else ChSel = (2 << 3);//拼音选择状态
+      y++;//到第四行了 拼音选择行
       Len = TImePinYin_GetChChar(&pIme->Data.PinYin,
                             _pFullVLine(w, TWin_pGetString(pWin, y) + x));
-      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | (1 << 3), y, xColorStart,  Len);//由用户处理可支持分别着色
+      TImeMng_cbFullStrColor(TIME_TYPE_PINYIN | ChSel, y, xColorStart,  Len);//由用户处理可支持分别着色
       h -= 2; //已填充数量
       y++;//到第五行了
     }
