@@ -120,8 +120,9 @@ void TScrnExcel_ReBulid(struct _TScrnExcel *pExcel);
 void TScrnExcel_Refurbish(const struct _TScrnExcel *pExcel);
     
 //----------------------跳转到指定AryId位置函数-------------------------
-void TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,
-                            unsigned short AryId);
+//返回0成功
+signed char TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,
+                                    unsigned short AryId);
 
 /**********************************************************************
                        回调函数

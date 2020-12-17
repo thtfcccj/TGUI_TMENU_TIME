@@ -184,15 +184,18 @@ unsigned short Excel_GetAryId(const struct _TScrnExcel *pExcel)
 }
 
 //----------------------跳转到指定AryId位置函数-------------------------
-void TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,
-                            unsigned short AryId)
+//返回0成功
+signed char TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,
+                                    unsigned short AryId)
 {
   const struct _TScrnExcelData *pData = pExcel->pData;
   unsigned short Line;
   if(pData->AryIdToLine == NULL) Line = AryId; //不支持时，则一一对应
   else Line = pData->AryIdToLine(pData, AryId);
-  if(Line >= TScrnExcel_GetItemCount(pExcel)) return;//异常(不支持时不在此页)或暂未执行
+  if(Line >= TScrnExcel_GetItemCount(pExcel)) //异常(不支持时不在此页)或暂未执行
+    return -1;
 
   //置光标并更新当前位置
   TListboxEx_SetSel(&pExcel->TListboxEx, Line);
+  return 0;
 }
