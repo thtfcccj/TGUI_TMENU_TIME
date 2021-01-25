@@ -42,7 +42,8 @@ static signed char _SetSign(struct _TEdit *pEdit,
   return -3;      //按键无效
     
 ValueChange:
-  Value = 0 - Value;//取绝对值
+  if(Value != 0) Value = 0 - Value;//取绝对值
+  else Value = -1;//让+0变为负1以方便调整
   _SetValue(pEdit,Value);//置数
   return 0;
 }
