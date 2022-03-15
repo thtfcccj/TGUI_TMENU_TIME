@@ -8,9 +8,11 @@
 
 #include "TMenuCfg.h"
 
-#ifdef TM_EN_MUTI_LAN //多国语言选择时单独定义
+#ifdef TM_EN_MUTI_LAN            //常量选择型多国语言时
   #include "TMenuMember_MutiLan.h"
-#else 
+#elif defined(TM_RESOURCE_LAN)  //由资源文件获取多国语言时
+  #include "TMenuMember_ResourceLan.h"
+#else  //单一语言字符串时
 
 /**************************************************************************
                        不支持多国语言时定义
