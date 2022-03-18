@@ -18,6 +18,13 @@ struct _TMenu{
   TMenuNotify_t cbNotify;     //与用户空间交互的通报函数
 };
 
+//为只读EditSel时,只需要菜单头即可：
+struct _TMenuSelRO{
+  unsigned char Type;      //菜单类型及相关标志
+  unsigned char Size;       //由菜单类型决定的相关数据大小
+  const LanCode_t *pgHeader; //菜单头,为NULL时从回调里读取  
+};
+
 /********************************************************************
                        可选的项查找表结构支持
 ********************************************************************/

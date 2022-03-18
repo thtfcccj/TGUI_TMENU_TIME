@@ -50,7 +50,7 @@
 //  unsigned char Size;     //可供选择的调整项个数
 //  LanguageCode_t *pgHeader; //菜单头,为NULL时从回调里读取
 //  struct _TMenu *pParent;   //自已的父菜单
-//  const TMenu_t*;           //存放自已的子菜单阵列连接头
+//  const TMenu_t*;           //存放自已的子菜单阵列连接头,只读时可为struct _TMenuSelRO
 //  TMenuNotify_t Notify;     //与用户空间交互的通报函数
 //}TMenu_t;
 
@@ -72,7 +72,6 @@ struct _EditSelUser{
  TItemSize_t CurItem;
  const char *pData;//对应子菜单项位置的当前数值
 };
-
 
 //用户回调函数响应类型及需实现的功能有:
 //1:类型为:TM_NOTIFY_GET_DATA时,需装入pData

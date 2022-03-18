@@ -12,7 +12,7 @@
 
 //----------------------由LanCode_t结构得到字符串---------------
 //此函数交由用户实现
-const char *pLanCodeToChar(LanCode_t *pLanCode);
+const char *pLanCodeToChar(const LanCode_t *pLanCode);
 
 #endif
 
