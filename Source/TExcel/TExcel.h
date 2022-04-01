@@ -35,13 +35,16 @@
 //----------------------------------参数描述------------------------------------
 //ParaId： 即功能ID: 将结构对像阵列的成员函数分类排列，下标即为功能ID
 //此功能为参数描述结构，通过此描述与结构对像交换数据
+struct _TExcel;
 struct _TExcelParaDesc{
   //参数ID显示信息，见定义
   const unsigned char *pDispInfo;
   //得到参数ID标题头字符串
   const char *(*pGetHeader)(unsigned char ParaId); 
-  //得到功能Id对应的字符串显示字符
-  const char *(*pGetData)(unsigned short AryId, unsigned char ParaId);
+  //得到功能Id对应的字符串显示字符,返回NULL数据结束
+  const char *(*pGetData)(struct _TExcel *pUi,
+                           unsigned short InLine, //AryId = pUi->IdLut[InLine] 
+                           unsigned char ParaId);
 };
 
 //参数ID显示信息定义为：
@@ -60,6 +63,7 @@ struct _TExcelStatic{
   //下标(1开始)为列顺序，对应值为参数ID， 
   const unsigned char *pParaIdLut;
   //得到项总数(总行数),返回负值表示自动从查找表中得出,值仅为参考
+  //此成员为NULL时表示动态获取总数
   signed short(*GetLineCount)(void);
 };
 
@@ -68,8 +72,8 @@ struct _TExcelStatic{
 //1. 实现TExcel_cbFullDefaultColor()与TExcel_cbFullColor()函数
 //2. pParaIdLut->首位长度的最高位置位
 //3. 在struct _TExcelParaDesc->pGetFunString()函数中:
-//  (1. 调用TExcel_pGetData2ColorBuf()填充当前项颜色
-//  (2. 再调用TExcel_SetData2ColorBufSize()设置颜色区大小
+//  (1. 调用TExcel_SetItemColor()， 填充当前项颜色
+//  (2. 或调用TExcel_SetStrColor()，可分别填充本项内不同字符不同颜色
 //注：暂只支持置前景色
 
 //---------------------------------主结构---------------------------------------
@@ -92,7 +96,8 @@ struct _TExcel{
   unsigned char LineStrLen;                 //本次行字符长度
   
   #ifdef SUPPORT_COLOR //支持颜色时
-    unsigned char Data2ColorSize;         //支持颜色填充时,颜色信息填充个数  
+    unsigned char Data2ColorSize;         //支持颜色填充时,颜色信息填充个数 
+    Color_t ItemColor; //Data2ColorSize = 255时，用此指定的颜色填充
     Color_t Data2ColorBuf[TEXCEL_LEN_MASK]; //支持颜色填充时，颜色信息填充
   #endif
 
@@ -119,15 +124,13 @@ void TExcel_Init(struct _TExcel *pUi,
                  const struct _TExcelStatic *pStatic,//静态数据结构
                  unsigned char PageLine);     //当前页显示行数，0表示所有 
 
-//-----------------------------得到当前项的颜色缓冲区--------------------------
-//支持颜色时调用
-#define TExcel_pGetData2ColorBuf(ui) (((struct _TExcel *)(ui))->Data2ColorBuf)
+//------------------------------设置当前项颜色-----------------------------
+void TExcel_SetItemColor(struct _TExcel *pUi, Color_t ItemColor);
 
-//-----------------------------设置当前项的颜色缓冲区大小------------------------
-//支持颜色时调用,size <= 25;
-#define TExcel_SetData2ColorBufSize(ui, size) \
-  do{((struct _TExcel *)(ui))->Data2ColorSize = (size);}while(0)
-
+//--------------------------------设置字符颜色-----------------------------
+void TExcel_SetStrColor(struct _TExcel *pUi, 
+                        Color_t Color, 
+                        unsigned char StrSize);
 
 //-----------------------------由当前行得到查找表ID值------------------------
 unsigned short TExcel_GetIdLutVol(const void *pHandle,
@@ -135,7 +138,7 @@ unsigned short TExcel_GetIdLutVol(const void *pHandle,
 
 //-----------------------------本次是否更新完成-----------------------------
 #define TExcel_IsCurFinal(ui) (1)
-    
+  
 /******************************************************************************
                             相关行函数-UI部分
 *******************************************************************************/  

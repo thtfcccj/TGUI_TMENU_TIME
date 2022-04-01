@@ -39,22 +39,22 @@ void TGuiColor_SetDefault(unsigned char TitleY)
   }
 }
 
-//-------------------------------设置行坐标整体颜色函数--------------------------
+//-------------------------------设置行坐标整体颜色函数-------------------------
 void TGuiColor_SetPenColor(unsigned char y,
                         unsigned char x,
                         unsigned char xLen,
                         Color_t Color)
 {
-  memset(&TGuiColor.MainPenColor[y][x], Color, xLen);//Color_t=1byte时
+  Color_Full(Color, &TGuiColor.MainPenColor[y][x], xLen);  
 }
 
-//-------------------------------设置行坐标对应颜色函数--------------------------
+//-------------------------------设置行坐标对应颜色函数-------------------------
 void TGuiColor_SetPenColorP(unsigned char y,
                         unsigned char x,
                         unsigned char xLen,
                         const Color_t *pColor)
 {
-  memcpy(&TGuiColor.MainPenColor[y][x], pColor,xLen);  //Color_t=1byte时
+  Color_Copy(&TGuiColor.MainPenColor[y][x], pColor, xLen); 
 }
 
 /****************************************************************************

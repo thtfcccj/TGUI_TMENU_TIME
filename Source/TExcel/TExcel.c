@@ -80,11 +80,15 @@ const char* TExcel_pGetHeader(struct _TExcel *pUi)
 unsigned short TExcel_GetLineCount(struct _TExcel *pUi)
 {
   const struct _TExcelStatic *pStatic = pUi->pStatic;
-  signed short Count = pStatic->GetLineCount();
-  if(Count >= 0){//直接用户空间获取
-    pUi->LineCount = Count; //手动更新有效
-    return Count;
+  signed short Count;
+  if(pStatic->GetLineCount != NULL){
+    Count = pStatic->GetLineCount();
+    if(Count >= 0){//直接用户空间获取
+      pUi->LineCount = Count; //手动更新有效
+      return Count;
+    }
   }
+  else Count = -16383; //未定义时，置最大允许
   //自动获取
   if(pUi->LineCount > 0) //已自动更新时
     return pUi->LineCount;
@@ -122,7 +126,14 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
   //根据对齐方式填充
   for(; ParaLen > 0; ParaLen--){
     unsigned char ParaId = *pParaIdLut++;
-    const char *pDispStr = pParaDesc->pGetData(pUi->IdLut[Line], ParaId); //显示字符串
+    #ifdef SUPPORT_COLOR //支持颜色时
+      pUi->Data2ColorSize = 0;//默认不填充
+    #endif
+    const char *pDispStr = pParaDesc->pGetData(pUi, Line, ParaId); //显示字符串
+    if(pDispStr == NULL){//结束了
+      pUi->LineCount = pUi->StartLine + Line;//更新总数
+      return NULL;
+    }
     unsigned char DispInfo = *(pParaDesc->pDispInfo + ParaId);
     unsigned char Space = strFull(pBuf, //缓冲区
                                   pDispStr,        //数据源
@@ -130,13 +141,20 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
                (DispInfo & TEXCEL_ALIGN_MASK) >> TEXCEL_ALIGN_SHIRT);//对齐方式
     //支持颜色填充且用户填充有颜色时，让用户填充当前表格指定位置颜色
     #ifdef SUPPORT_COLOR //支持颜色时
-      if(HaveColor && (pUi->Data2ColorSize)){
-        TExcel_cbFullColor(Line, 
-                           (pBuf - pUi->LineBuf) + Space,
-                           pUi->Data2ColorBuf, 
-                           pUi->Data2ColorSize);
-        pUi->Data2ColorSize = 0;  //复位以下次填充
-      }
+     if(HaveColor){
+       unsigned char ColorSize= pUi->Data2ColorSize;
+       if(ColorSize == 255){//使用统一颜色时预处理
+         ColorSize = strlen(pDispStr);
+         Color_Full(pUi->ItemColor, pUi->Data2ColorBuf, ColorSize);
+       }
+       if(ColorSize > 0){//独立填充颜色
+          TExcel_cbFullColor(Line, 
+                             (pBuf - pUi->LineBuf) + Space,
+                             pUi->Data2ColorBuf, 
+                             pUi->Data2ColorSize);          
+
+       }
+     }
     #endif //SUPPORT_COLOR
     pBuf += DispInfo & TEXCEL_LEN_MASK;
     if(!(DispInfo & TEXCEL_DIS_SPACE)){//没有禁止间隔时跟空格以间隔
@@ -148,15 +166,16 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
 }
 
 //----------------------------------更新数据实现---------------------------------
-//返回是否更新完成(因数据更新有延时，永远返回0即当前数据未完成)
+//返回是否更新完成
 signed char TExcel_UpdateData(struct _TExcel *pUi,
                                   unsigned short StartLine, //起始行 
                                   unsigned short Count)    //总数
 {
+  pUi->StartLine = StartLine;
   //重载页内查找表
-  pUi->IdCount = TExcel_cbReloadLut(pUi->Handle,  StartLine, 
+  pUi->IdCount = TExcel_cbReloadLut(pUi->Handle, StartLine, 
                                     pUi->IdLut, Count);
-  return 0;
+  return 1; //直接完成
 }
 
 //--------------------------------指定行转换为阵列--------------------------------
@@ -188,5 +207,23 @@ unsigned short TExcel_AryIdToLine(struct _TExcel *pUi, unsigned short AryId)
   return 0xffff;//未找到设备
   
 }
+
+//------------------------------设置当前项颜色-----------------------------
+void TExcel_SetItemColor(struct _TExcel *pUi, Color_t ItemColor)
+{
+  pUi->ItemColor = ItemColor;
+  pUi->Data2ColorSize = 255;
+}
+
+//--------------------------------设置字符颜色-----------------------------
+void TExcel_SetStrColor(struct _TExcel *pUi, 
+                        Color_t Color, 
+                        unsigned char StrSize)
+{
+  Color_Full(Color, pUi->Data2ColorBuf, StrSize);
+  pUi->Data2ColorSize = StrSize;
+}
+
+
 
 
