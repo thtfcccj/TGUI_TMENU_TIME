@@ -15,7 +15,7 @@ const char* TExcel_Scrn_pGetHeader(const struct _TScrnExcelData *pExceData)
 //---------------------------得到数据行总数实现----------------------------------
 unsigned short TExcel_Scrn_GetItemCount(const struct _TScrnExcelData *pExceData)
 {
-  return TExcel_GetItemCount((struct _TExcel *)pExceData->pData);
+  return TExcel_GetLineCount((struct _TExcel *)pExceData->pData);
 }
 
 //--------------------------------得到行数据实现--------------------------------

@@ -26,7 +26,29 @@
 #define _FLAG_LEFT_END  0x40      //循环模式调整时到达左边界标志
 #define _FLAG_RIGHT_END  0x80      //循环模式调整时到达右边界标志
 
-   
+
+//----------------------------常用描述结构------------------------
+#if TM_MNUMADJ_DEFAULT_DESC & 0x01
+  const struct _MNumDesc MNumDesc_U8 = {MNUM_TYPE_DEC, 0, 255};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x02
+  const struct _MNumDesc MNumDesc_B1 = {MNUM_TYPE_DEC, 0, 1};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x04
+  const struct _MNumDesc MNumDesc_B2 = {MNUM_TYPE_DEC, 0, 3};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x08
+  const struct _MNumDesc MNumDesc_9 = {MNUM_TYPE_DEC, 0, 9};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x10
+  const struct _MNumDesc MNumDesc_99 = {MNUM_TYPE_DEC, 0, 99};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x20
+  const struct _MNumDesc MNumDesc_999 = {MNUM_TYPE_DEC, 0, 999};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x40
+  const struct _MNumDesc MNumDesc_9999 = {MNUM_TYPE_DEC, 0, 9999};
+#endif
 
 /*****************************************************************
                       编辑模式相关

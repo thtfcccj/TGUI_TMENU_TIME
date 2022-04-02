@@ -146,7 +146,7 @@ unsigned short TExcel_GetIdLutVol(const void *pHandle,
 const char* TExcel_pGetHeader(struct _TExcel *pUi);
 
 //---------------------------得到数据行总数实现----------------------------------
-unsigned short TExcel_GetItemCount(struct _TExcel *pUi);
+unsigned short TExcel_GetLineCount(struct _TExcel *pUi);
 
 //--------------------------------得到行数据实现--------------------------------
 //返回NULL表示结束

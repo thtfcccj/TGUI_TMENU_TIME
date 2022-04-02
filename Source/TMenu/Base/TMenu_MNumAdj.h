@@ -41,7 +41,35 @@
 //#define   TWIDGET_EN_NOTIFY   0x04  //无滚动条与边框时允许在用户空时显示提示信息
 //#define   TLISTBOXEX_EN_RETURN  0x02      //允许带返回字
 
+//------------------------------常用描述结构----------------------------
+//MNumDesc默认结构支持： b0:255, b1:0-1,  b2:0-3,    b3：0-9
+//                       b4:0-99 b5:0-999,b6,0-9999
+#ifndef TM_MNUMADJ_DEFAULT_DESC
+  #define TM_MNUMADJ_DEFAULT_DESC  0   //默认不支持
+#endif 
 
+#if TM_MNUMADJ_DEFAULT_DESC & 0x01
+  extern  const struct _MNumDesc MNumDesc_U8;// = {MNUM_TYPE_DEC, 0, 255};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x02
+  extern  const struct _MNumDesc MNumDesc_B1;// = {MNUM_TYPE_DEC, 0, 1};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x04
+  extern  const struct _MNumDesc MNumDesc_B2;// = {MNUM_TYPE_DEC, 0, 3};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x08
+  extern  const struct _MNumDesc MNumDesc_9;// = {MNUM_TYPE_DEC, 0, 9};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x10
+  extern  const struct _MNumDesc MNumDesc_99;// = {MNUM_TYPE_DEC, 0, 99};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x20
+  extern  const struct _MNumDesc MNumDesc_999;// = {MNUM_TYPE_DEC, 0, 999};
+#endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x40
+  extern  const struct _MNumDesc MNumDesc_9999;// = {MNUM_TYPE_DEC, 0, 9999};
+#endif
+    
 /**********************************************************************
                      用户使用相关
 **********************************************************************/
