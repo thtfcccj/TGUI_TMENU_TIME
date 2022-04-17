@@ -43,7 +43,7 @@
 
 //------------------------------常用描述结构----------------------------
 //MNumDesc默认结构支持： b0:255, b1:0-1,  b2:0-3,    b3：0-9
-//                       b4:0-99 b5:0-999,b6,0-9999
+    //                   b4:0-99 b5:0-999,b6,0-9999, b7: 65535
 #ifndef TM_MNUMADJ_DEFAULT_DESC
   #define TM_MNUMADJ_DEFAULT_DESC  0   //默认不支持
 #endif 
@@ -69,6 +69,9 @@
 #if TM_MNUMADJ_DEFAULT_DESC & 0x40
   extern  const struct _MNumDesc MNumDesc_9999;// = {MNUM_TYPE_DEC, 0, 9999};
 #endif
+#if TM_MNUMADJ_DEFAULT_DESC & 0x80
+  extern  const struct _MNumDesc MNumDesc_U16;// = {MNUM_TYPE_DEC, 0, 65535};
+#endif  
     
 /**********************************************************************
                      用户使用相关

@@ -50,6 +50,10 @@
   const struct _MNumDesc MNumDesc_9999 = {MNUM_TYPE_DEC, 0, 9999};
 #endif
 
+#if TM_MNUMADJ_DEFAULT_DESC & 0x80
+  const struct _MNumDesc MNumDesc_U16 = {MNUM_TYPE_DEC, 0, 65535};
+#endif  
+  
 /*****************************************************************
                       编辑模式相关
 *****************************************************************/
