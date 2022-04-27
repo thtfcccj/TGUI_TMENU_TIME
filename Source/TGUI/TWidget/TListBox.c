@@ -82,9 +82,11 @@ void TListbox_Key(TListbox_t *pListbox,unsigned char Key)
     //if((Key >= '1') && (Key <= '9')) //数字键处理后,还需当做进入键处理
     //  Key = TGUI_KEY_ENTER; 
  }
- if(Key == TGUI_KEY_ENTER) 
-    PaintFlag = *(unsigned char*)TGUI_NOTIFY_RUN(pListbox->cbGUINotify,pListbox,TGUI_NOTIFY_KEY_ENTER,
-                                                &TListbox_GetSel(pListbox));
+ if(Key == TGUI_KEY_ENTER) {
+    TGUI_NOTIFY_RUN(pListbox->cbGUINotify,pListbox,TGUI_NOTIFY_KEY_ENTER,
+                    &TListbox_GetSel(pListbox));
+    PaintFlag = 0xff;//确认键强制刷新所有以实现手动实时更新等功能
+ }
 
   //重绘相关
   ListBox_Paint(pListbox,PaintFlag);

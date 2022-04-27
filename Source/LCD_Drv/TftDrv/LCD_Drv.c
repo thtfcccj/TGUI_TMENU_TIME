@@ -57,6 +57,8 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
     
   unsigned short yPixel = (unsigned short )y << 4;
   yPixel += LCD_Drv_cbGetYpixelOffset();
+  unsigned short xPixelStart = LCD_Drv_cbGetXpixelOffset();
+  if(xPixelStart) xEnd -= (xPixelStart >> 3);//防止超过显示屏
   for(; x < xEnd; x++){
     char c = *pBuf;
     //当前背景色
@@ -65,13 +67,15 @@ void TWinMng_cbUpdateRow(unsigned char Lcd,    //当前操作那个显示屏
     else Brush = *pBrush;
     //ASCII直接转换
     if(c < 0x80){
-      PlotPB_Asc((unsigned short )x << 3, yPixel, c, *pPen, Brush);
+      PlotPB_Asc(xPixelStart + ((unsigned short )x << 3), 
+                 yPixel, c, *pPen, Brush);
     }
     //未检查GB2312正确性！！！！
     else{
       if((x + 1) >= xEnd) break;//半个汉字结束了，异常 
       pBuf++; //取下半个字
-      PlotPB_GB2312((unsigned short )x << 3, yPixel,
+      PlotPB_GB2312(xPixelStart + ((unsigned short )x << 3), 
+                    yPixel,
                     ((unsigned char)c << 8) | *pBuf, *pPen, Brush); //高位在前
       //后半增加
       x++;
