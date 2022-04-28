@@ -280,6 +280,7 @@ void TImeMng_Task(struct _TImeMng *pIme)
 //用户输入字符确认退出后调用此函数
 void TImeMng_Quit(struct _TImeMng *pIme)
 {
+  pIme->State = TIME_MNG_STATE_EDIT; //避免刷屏
   //去除增加的颜色
   TImeMng_cbFullStrColor(0xfe,
                          pIme->DispOffsetY + 4,   //pWin内y坐标,4为箭头起始行

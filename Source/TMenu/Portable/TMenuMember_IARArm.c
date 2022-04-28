@@ -11,20 +11,53 @@ extern const TMenu_t MGetPower; //定义在code区的顶层菜单
 
 #ifdef TM_EN_LUT
 static unsigned char _ItemLUT[TM_ITEM_MAX + 1];//缓冲当前查找表
+
+#ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+  static unsigned short _DyncLutSize; //动态查找表大小,项>=128时定义
+  static unsigned short _DyncLutItem; //动态查找表项
 #endif
+  
+#endif //TM_EN_LUT
 
 //----------------------缓冲查找表----------------------------
 #ifdef TM_EN_LUT
-#define _GetItemLUT(pMenu) \
-do{\
-  if((pMenu)->Size & TM_TYPE_ITEM_LUT)\
-    TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_GET_LUT,_ItemLUT);\
-}while(0)
-
+void _GetItemLUT(const TMenu_t *pMenu)
+{
+  if(!((pMenu)->Size & TM_TYPE_ITEM_LUT)) return;
+  
+  #ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+    _DyncLutSize = 0; //用户不响应时不支持
+    TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_GET_DLUT_SIZE, &_DyncLutSize);
+    if(_DyncLutSize != 0) return; //使用动态查找表获取数据
+  #endif
+   
+  //从用户空间获得数据
+  TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_GET_LUT,_ItemLUT);
+}
 #else
-#define _GetItemLUT(pMenu) do{ }while(0)
+  #define _GetItemLUT(pMenu) do{ }while(0)
 #endif
 
+//----------------------------得到查找表值--------------------------------
+#ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+unsigned short _GetLutItem(const TMenu_t *pMenu,
+                            unsigned short Item)
+{
+  if(!(pMenu->Size & TM_TYPE_ITEM_LUT)) return Item;
+  
+  if(_DyncLutSize){ //当前为动态查找表时从用户空间获取数据
+    _DyncLutItem = Item;
+    TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_GET_DLUT_ITEM, &_DyncLutItem);
+    return _DyncLutItem;
+  }
+  return _ItemLUT[Item + 1];
+}
+  #define _GetItemVol(pmenu, item) _GetLutItem(pmenu, item);
+#else
+  #define _GetItemVol(pmenu, item) _ItemLUT[item + 1];
+#endif
+
+//-----------------------得到顶层菜单--------------------------
 const TMenu_t *TM_pGetTopMenu(void)
 {
   //根据界面决定各顶层菜单的结构
@@ -39,7 +72,7 @@ const TMenu_t *TM_pGetParent(const TMenu_t *pMenu)
 {
   #ifdef TM_DYNC_MENU   //动态菜单支持时通报更新父菜单
    if(pMenu->cbNotify)
-    TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_UPDATE_PARENT,NULL);
+     TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_UPDATE_PARENT,NULL);
   #endif
    
   pMenu = pMenu->pParent;
@@ -55,7 +88,7 @@ const TMenu_t *TM_pGetSubMenu(const TMenu_t *pMenu,
   TMenu_t const *const *PAry = (TMenu_t const *const *)pMenu->pv;  //C51的方式
 
   #ifdef TM_EN_LUT//有表时先查表
-  if(pMenu->Size & TM_TYPE_ITEM_LUT) SubMenuID = _ItemLUT[SubMenuID + 1];
+    SubMenuID = _GetItemVol(pMenu, SubMenuID);
   #endif
   
   #ifdef TM_DYNC_MENU   //动态菜单支持时通报更新子菜单
@@ -97,14 +130,22 @@ unsigned char TM_GetType(const TMenu_t *pMenu)
 }
 
 //-------------------从菜单结构获得大小函数------------------------
-unsigned char TM_GetSize(const TMenu_t *pMenu)
+#ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+  unsigned short TM_GetSize(const TMenu_t *pMenu)
+#else
+  unsigned char TM_GetSize(const TMenu_t *pMenu)
+#endif
 {
   #ifdef TM_EN_LUT  //有查找表时重定向到查找表大小:
-  if(pMenu->Size & TM_TYPE_ITEM_LUT) return _ItemLUT[0];
+  if(pMenu->Size & TM_TYPE_ITEM_LUT){
+    #ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+      if(_DyncLutSize) return _DyncLutSize; //为动态查找表时
+    #endif
+    return _ItemLUT[0];
+  }
   #endif  
 
   return pMenu->Size;
-  
 }
 
 //----------------得到指定子菜单项头函数-------------------
@@ -115,7 +156,7 @@ const char *TM_GetSubMenuHeader(const TMenu_t *pMenu,
   TMenu_t const *const *PAry = (TMenu_t const *const *)pMenu->pv;  //C51的方式
 
   #ifdef TM_EN_LUT//有表时先查表
-  if(pMenu->Size & TM_TYPE_ITEM_LUT) Item = _ItemLUT[Item + 1];
+    Item = _GetItemVol(pMenu, Item);
   #endif
 
   //RPC模式时,子菜单功能可能不完整, 先从用户空间获得子菜单头,若不能获取再继续
@@ -143,13 +184,13 @@ const char *TM_GetItemString(const TMenu_t *pMenu,
 {
   char *pBuf;
   #ifdef TM_EN_LUT  //有查找表时重定向到查找表
-  if(pMenu->Size & TM_TYPE_ITEM_LUT) Item = _ItemLUT[Item + 1];
+    Item = _GetItemVol(pMenu, Item);
   #endif
 
   if(pMenu->pv){
     #ifdef TM_DYNC_MENU   //动态菜单支持时通报更新子菜单
      if(pMenu->cbNotify)
-      TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_UPDATE_SUB,&Item);
+      TMENU_NOTIFY_RUN((pMenu)->cbNotify,TM_NOTIFY_USER_UPDATE_SUB, &Item);
     #endif
     const LanCode_t *pCode = *((const LanCode_t **)(pMenu->pv) + Item);
     return pLanCodeToChar(pCode);
@@ -190,7 +231,6 @@ TItemSize_t TM_GetItemMaxLen(const TMenu_t *pMenu)
 unsigned char TMenu_GetItemPosWithLUT(unsigned char Pos)
 {
   return _ItemLUT[Pos + 1];
-  
 }
     
 

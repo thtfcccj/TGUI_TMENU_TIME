@@ -166,7 +166,11 @@ const char *TM_GetHeader(const TMenu_t *pMenu);
 unsigned char TM_GetType(const TMenu_t *pMenu);
 
 //-------------------从菜单结构获得大小函数------------------------
-unsigned char TM_GetSize(const TMenu_t *pMenu);
+#ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+  unsigned short TM_GetSize(const TMenu_t *pMenu);
+#else
+  unsigned char TM_GetSize(const TMenu_t *pMenu);
+#endif
 
 //----------------得到指定子菜单项头函数-------------------
 const char *TM_GetSubMenuHeader(const TMenu_t *pMenu,

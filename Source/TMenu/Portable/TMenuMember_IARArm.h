@@ -30,22 +30,35 @@ struct _TMenuSelRO{
 ********************************************************************/
 
 #ifdef TM_EN_LUT   //查找表支持时:
+
   //复用Size结构最高位表示该结构附有项查找表
   #define   TM_TYPE_ITEM_LUT     0x80
   
-  //当有项查找表时,用户程序增加响应下列用户通报获取查找表结构(填充传入的pv指针)
-  #define    TM_NOTIFY_USER_GET_LUT    (TM_NOTIFY_USER_BASE + 0)
   //查找表结构定义为一个数组:其中
   //首位: 此查找表大小,<= struct _TMenu中的Size
   //后跟此查大小个数据,如
-  //static code const unsigned char _LUT = {2,  0,3}; 
-  
+  //static code const unsigned char _LUT = {2,  0,3};
+
+  //当有项查找表时,用户程序增加响应下列用户通报获取查找表结构(填充传入的pv指针)
+  //TM_TYPE_ITEM_LUT置位时，必须实现
+  #define  TM_NOTIFY_USER_GET_LUT    (TM_NOTIFY_USER_BASE + 0)
+
   //定义项最大个数,用内部于将查找表缓冲
-  #define   TM_ITEM_MAX         10
+  #ifndef TM_ITEM_MAX
+    #define   TM_ITEM_MAX         127 //最大支持,超过需启用动态查找表
+  #endif
 
   //-------------------根据当前菜单查找表获得所选位置---------------------
   unsigned char TMenu_GetItemPosWithLUT(unsigned char Pos);
 
+  //------------------------动态查找表支持-------------------------------
+  //当项数 >=128时，用此项可实现1~65535项的支持
+  #ifdef TM_EN_DYNC_LUT  //动态查找表支持时
+    //获取动态查找有大小，响应此函数返回非0时，使用动态表获取参数
+    #define  TM_NOTIFY_USER_GET_DLUT_SIZE    (TM_NOTIFY_USER_BASE + 1) 
+    //获取动态查找表项，输入为当前项位置，输出为目标值,不响应时相当于无查找表
+    #define  TM_NOTIFY_USER_GET_DLUT_ITEM    (TM_NOTIFY_USER_BASE + 2)
+  #endif
 #endif //#ifdef TM_EN_LUT
 
 
