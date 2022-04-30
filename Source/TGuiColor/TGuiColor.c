@@ -26,20 +26,24 @@ void TGuiColor_Init(unsigned char TitleY)//默认标题栏行位置,255表示无
 void TGuiColor_SetDefault(unsigned char TitleY)
 {
   //颜色区置默认
-  memset(&TGuiColor.MainPenColor,TGUI_COLOR_DEFAULT_PEN_DATA, 
-         sizeof(TGuiColor.MainPenColor));
-  memset(&TGuiColor.MainBrushColor, TGUI_COLOR_DEFAULT_BRUSH_DATA, 
-         sizeof(TGuiColor.MainPenColor));  
+  Color_Full(TGUI_COLOR_DEFAULT_PEN_DATA,
+             TGuiColor.MainPenColor[0],
+             sizeof(TGuiColor.MainPenColor) / sizeof(Color_t));
+  Color_Full(TGUI_COLOR_DEFAULT_BRUSH_DATA, 
+             TGuiColor.MainBrushColor[0],
+             sizeof(TGuiColor.MainPenColor) / sizeof(Color_t));   
   //标题栏
   if(TitleY < TLCD_HIGH){
-    memset(&TGuiColor.MainPenColor[TitleY], TGUI_COLOR_DEFAULT_PEN_TITLE, 
-           TLCD_WIDTH);  //Color_t=1byte时
-    memset(&TGuiColor.MainBrushColor[TitleY], TGUI_COLOR_DEFAULT_BRUSH_TITLE,
-           TLCD_WIDTH);//Color_t=1byte时
+    Color_Full(TGUI_COLOR_DEFAULT_PEN_TITLE, 
+               TGuiColor.MainPenColor[0],
+               TGuiColor_cbGetCurMainW());
+    Color_Full(TGUI_COLOR_DEFAULT_BRUSH_TITLE, 
+               TGuiColor.MainBrushColor[0],
+               TGuiColor_cbGetCurMainW()); 
   }
 }
 
-//-------------------------------设置行坐标整体颜色函数-------------------------
+//-------------------------------设置行坐标整体前景色函数-----------------------
 void TGuiColor_SetPenColor(unsigned char y,
                         unsigned char x,
                         unsigned char xLen,
@@ -48,13 +52,32 @@ void TGuiColor_SetPenColor(unsigned char y,
   Color_Full(Color, &TGuiColor.MainPenColor[y][x], xLen);  
 }
 
-//-------------------------------设置行坐标对应颜色函数-------------------------
+
+//-------------------------------设置行坐标整体背景色函数-----------------------
+void TGuiColor_SetBrushColor(unsigned char y,
+                        unsigned char x,
+                        unsigned char xLen,
+                        Color_t Color)
+{
+  Color_Full(Color, &TGuiColor.MainBrushColor[y][x], xLen);  
+}
+
+//---------------------------设置行坐标对应前景色函数-------------------------
 void TGuiColor_SetPenColorP(unsigned char y,
                         unsigned char x,
                         unsigned char xLen,
                         const Color_t *pColor)
 {
   Color_Copy(&TGuiColor.MainPenColor[y][x], pColor, xLen); 
+}
+
+//---------------------------设置行坐标对应背景色函数-------------------------
+void TGuiColor_SetBrushColorP(unsigned char y,
+                        unsigned char x,
+                        unsigned char xLen,
+                        const Color_t *pColor)
+{
+  Color_Copy(&TGuiColor.MainBrushColor[y][x], pColor, xLen); 
 }
 
 /****************************************************************************

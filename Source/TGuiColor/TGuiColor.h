@@ -70,17 +70,36 @@ void TGuiColor_SetDefault(unsigned char TitleY);
 #define TGuiColor_EnTGuiDisp(mask)  do{TGuiColor.LcdLineEnMask |= (mask);}while(0)
 #define TGuiColor_DisTGuiDisp(mask) do{TGuiColor.LcdLineEnMask &= ~(mask);}while(0)
 
-//-------------------------------设置行坐标整体颜色函数--------------------------
+//-------------------------------设置行坐标整体前景色函数--------------------------
 void TGuiColor_SetPenColor(unsigned char y,
                         unsigned char x,
                         unsigned char xLen,
                         Color_t Color);
 
-//-------------------------------设置行坐标对应颜色函数--------------------------
+//-------------------------------设置行坐标整体背景色函数-----------------------
+void TGuiColor_SetBrushColor(unsigned char y,
+                        unsigned char x,
+                        unsigned char xLen,
+                        Color_t Color);
+
+//-------------------------------设置行坐标对应前景色函数--------------------------
 void TGuiColor_SetPenColorP(unsigned char y,
                         unsigned char x,
                         unsigned char xLen,
                         const Color_t *pColor);
 
+//---------------------------设置行坐标对应背景色函数-------------------------
+void TGuiColor_SetBrushColorP(unsigned char y,
+                        unsigned char x,
+                        unsigned char xLen,
+                        const Color_t *pColor);
+
+/*******************************************************************************
+                             回调函数
+*******************************************************************************/
+//---------------------------得到当前主窗体字符宽度---------------------------
+unsigned char TGuiColor_cbGetCurMainW(void);
+
 
 #endif //__TGUI_COLOR_H
+

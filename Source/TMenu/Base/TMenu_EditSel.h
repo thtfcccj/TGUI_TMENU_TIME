@@ -29,8 +29,10 @@
 **********************************************************************/
 
 //定义默认样式(见TWidget.h与复选控件):
-#define   TM_M_EDIT_SEL_STYLE_DEFAULT    \
-  (TWIDGET_EN_HEADER | TWIDGET_EN_VSCOLL | TWIDGET_EN_NOTIFY)
+#ifndef TM_M_EDIT_SEL_STYLE_DEFAULT
+  #define   TM_M_EDIT_SEL_STYLE_DEFAULT    \
+    (TWIDGET_EN_HEADER | TWIDGET_EN_VSCOLL | TWIDGET_EN_NOTIFY)
+#endif
 
 //注:可用的有:
 //#define   TWIDGET_EN_FRAME    0x80  //该构件具有边框,当LC高度>-3行时此项有效

@@ -66,10 +66,11 @@ struct _TImeMng{
 };
 
 //内部工作状态，定义为:
-#define TIME_MNG_STATE_EDIT        0   //编辑模式
-#define TIME_MNG_STATE_FORCE_EXIT  1   //强制退出提示
-#define TIME_MNG_STATE_SEL         2  //输入法选择模式
-#define TIME_MNG_STATE_IME         3  //输入法模式
+#define TIME_MNG_STATE_IDIE        0   //空闲模式,未使用时为此模式
+#define TIME_MNG_STATE_EDIT        1   //编辑模式
+#define TIME_MNG_STATE_FORCE_EXIT  2   //强制退出提示
+#define TIME_MNG_STATE_SEL         3  //输入法选择模式
+#define TIME_MNG_STATE_IME         4  //输入法模式
 
 /*****************************************************************************
                             相关函数

@@ -187,7 +187,7 @@ unsigned char TExcel_cbReloadLut(unsigned char Handle,        //句柄
 
 //------------------------填充指定数据行默认颜色---------------------------------
 #ifdef SUPPORT_COLOR //支持颜色时
-  void TExcel_cbFullDefaultColor(unsigned char y); //本页内对应数据行
+  void TExcel_cbFullDefaultColor(signed char y); //本页内对应数据行,负为标题
 #endif
 
 //-----------------------------更新指定位置颜色---------------------------------

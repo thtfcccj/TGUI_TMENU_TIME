@@ -51,6 +51,11 @@ const char* TExcel_pGetHeader(struct _TExcel *pUi)
   const unsigned char *pParaIdLut = pStatic->pParaIdLut;
   unsigned char ParaLen = *pParaIdLut++ & 0x7f;
   char *pBuf = pUi->LineBuf;
+  //支持颜色填充时，通报用户填充默认色
+  #ifdef SUPPORT_COLOR //支持颜色时
+    TExcel_cbFullDefaultColor(-1);
+  #endif
+  
   //根据显示方式填充
   const struct _TExcelParaDesc *pParaDesc = pStatic->pParaDesc;
   const unsigned char *pDispInfo = pParaDesc->pDispInfo;
@@ -151,8 +156,7 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
           TExcel_cbFullColor(Line, 
                              (pBuf - pUi->LineBuf) + Space,
                              pUi->Data2ColorBuf, 
-                             pUi->Data2ColorSize);          
-
+                             ColorSize);          
        }
      }
     #endif //SUPPORT_COLOR

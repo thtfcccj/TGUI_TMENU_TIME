@@ -162,6 +162,7 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   if(TWin_GetW(pWin) < TIME_MNG_DISP_W) return -1;//不够显示
   if(TWin_GetH(pWin) < TIME_MNG_DISP_H) return -1;//不够显示
   memset(pIme, 0,sizeof(struct _TImeMng)); 
+  pIme->State = TIME_MNG_STATE_EDIT; //进入空闲模式
   
   //计算显示偏移
   if(TWin_GetW(pWin) > TIME_MNG_DISP_W)
@@ -280,12 +281,13 @@ void TImeMng_Task(struct _TImeMng *pIme)
 //用户输入字符确认退出后调用此函数
 void TImeMng_Quit(struct _TImeMng *pIme)
 {
-  pIme->State = TIME_MNG_STATE_EDIT; //避免刷屏
+  if(pIme->State == TIME_MNG_STATE_IDIE) return; //空闲模式
   //去除增加的颜色
   TImeMng_cbFullStrColor(0xfe,
                          pIme->DispOffsetY + 4,   //pWin内y坐标,4为箭头起始行
                          pIme->DispOffsetX,       //pWin内x坐标
                          TIME_MNG_DISP_W);       //x长度
+  pIme->State = TIME_MNG_STATE_IDIE; //空闲了
 }
 
 /*****************************************************************************

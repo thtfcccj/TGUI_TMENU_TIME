@@ -12,8 +12,10 @@
                       配置区
 **********************************************************************/
 //定义默认单选按钮样式(见TWidget.h与单选控件):
-#define   TM_SUB_MENU_STYLE_DEFAULT \
-  (TWIDGET_EN_HEADER | TWIDGET_EN_VSCOLL | TWIDGET_EN_NOTIFY)
+#ifndef TM_SUB_MENU_STYLE_DEFAULT
+  #define   TM_SUB_MENU_STYLE_DEFAULT \
+    (TWIDGET_EN_HEADER | TWIDGET_EN_VSCOLL | TWIDGET_EN_NOTIFY)
+#endif
 
 //注:可用的有:
 //#define   TWIDGET_EN_FRAME    0x80  //该构件具有边框,当LC高度>-3行时此项有效
