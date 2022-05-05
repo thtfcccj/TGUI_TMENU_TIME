@@ -103,7 +103,7 @@ unsigned short Excel_GetAryId(const struct _TScrnExcel *pExcel);
 #define TScrnExcel_GetCursor(pexcel) TListboxEx_GetSel(&(pexcel)->TListboxEx)
 
 //---------------------得到垂直页大小函数------------------------------
-#define TScrnExcel_GetVPage(pexcel) TListboxEx_GetV((&(pexcel)->TListboxEx))
+#define TScrnExcel_GetVPage(pexcel) TListboxEx_GetH((&(pexcel)->TListboxEx))
 
 //----------------------------得到项总数函数------------------------------
 #define TScrnExcel_GetItemCount(pExcel) TListboxEx_GetItems(&(pExcel)->TListboxEx)

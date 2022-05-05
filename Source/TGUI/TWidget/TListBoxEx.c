@@ -142,6 +142,10 @@ static const void *_ItemNotify(TListboxEx_t *pListboxEx,
   
   //得到用户空间字符串,含附加字
   pString = (const char *)TGUI_NOTIFY_RUN(cbGUINotify,pListboxEx,TGUI_NOTIFY_GET_ITEM,pvData);
+  if(pString == NULL){//返回异常了
+    *pBuf = '\0';//结束字符
+    return pBuf;
+  }
   ItemW = strlen(pString);
   //序号占位
   if(Style & TLISTBOXEX_EN_NO)

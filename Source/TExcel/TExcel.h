@@ -123,6 +123,10 @@ void TExcel_Init(struct _TExcel *pUi,
                  unsigned char Handle,        //句柄
                  const struct _TExcelStatic *pStatic,//静态数据结构
                  unsigned char PageLine);     //当前页显示行数，0表示所有 
+                 
+//------------------------------UI初始化后续函数---------------------------
+void TExcel_InitLater(struct _TExcel *pUi,
+                       unsigned char PageLine);     //当前页显示行数
 
 //------------------------------设置当前项颜色-----------------------------
 void TExcel_SetItemColor(struct _TExcel *pUi, Color_t ItemColor);

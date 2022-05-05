@@ -30,6 +30,15 @@ void TExcel_Init(struct _TExcel *pUi,
   pUi->IdCount = TExcel_cbReloadLut(Handle, 0, pUi->IdLut, PageLine);
 }
 
+//--------------------------------UI初始化后续函数---------------------------
+//查找表无效时需调用
+void TExcel_InitLater(struct _TExcel *pUi,
+                       unsigned char PageLine)    //当前页显示行数
+{
+  pUi->PageLine = PageLine;
+  pUi->IdCount = TExcel_cbReloadLut(pUi->Handle, 0, pUi->IdLut, PageLine);
+}
+
 //-----------------------------由当前行得到查找表ID值------------------------
 unsigned short TExcel_GetIdLutVol(const void *pHandle,
                                         unsigned short Line)
@@ -109,12 +118,19 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
   
   //得到当前行数据位置
   unsigned short StartLine = pUi->StartLine;
+  //数据不在缓冲区中
   if((Line < StartLine) || (Line >= (StartLine + pUi->IdCount))){
-    //异常数据不在缓冲区中
-    memset(pUi->LineBuf, ' ', TEXCEL_LINE_SIZE - 1);
-    *(pUi->LineBuf + (TEXCEL_LINE_SIZE - 1)) = '\0';//结束字符
-    return pUi->LineBuf; 
+    TExcel_UpdateData(pUi, Line, pUi->PageLine);//先更新
+    StartLine = pUi->StartLine;
+    //仍然不在范围时
+    if((Line < StartLine) || (Line >= (StartLine + pUi->IdCount))){
+      memset(pUi->LineBuf, ' ', TEXCEL_LINE_SIZE - 1);
+      *(pUi->LineBuf + (TEXCEL_LINE_SIZE - 1)) = '\0';//结束字符
+      return pUi->LineBuf; 
+    }
   }
+  unsigned short InLine = Line - StartLine;//下述使用内部行
+  
   const unsigned char *pParaIdLut = pStatic->pParaIdLut;
   unsigned char ParaLen = *pParaIdLut++;
   unsigned char HaveColor = ParaLen & 0x80;
@@ -124,7 +140,7 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
   
   //支持颜色填充时，通报用户填充默认色
   #ifdef SUPPORT_COLOR //支持颜色时
-    TExcel_cbFullDefaultColor(Line);
+    TExcel_cbFullDefaultColor(InLine);
   #endif
   
   const struct _TExcelParaDesc *pParaDesc = pStatic->pParaDesc;
@@ -134,9 +150,9 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
     #ifdef SUPPORT_COLOR //支持颜色时
       pUi->Data2ColorSize = 0;//默认不填充
     #endif
-    const char *pDispStr = pParaDesc->pGetData(pUi, Line, ParaId); //显示字符串
+    const char *pDispStr = pParaDesc->pGetData(pUi, InLine, ParaId); //显示字符串
     if(pDispStr == NULL){//结束了
-      pUi->LineCount = pUi->StartLine + Line;//更新总数
+      pUi->LineCount = Line;//更新总数
       return NULL;
     }
     unsigned char DispInfo = *(pParaDesc->pDispInfo + ParaId);
@@ -153,7 +169,7 @@ const char* TExcel_pGetLine(struct _TExcel *pUi,
          Color_Full(pUi->ItemColor, pUi->Data2ColorBuf, ColorSize);
        }
        if(ColorSize > 0){//独立填充颜色
-          TExcel_cbFullColor(Line, 
+          TExcel_cbFullColor(InLine, 
                              (pBuf - pUi->LineBuf) + Space,
                              pUi->Data2ColorBuf, 
                              ColorSize);          

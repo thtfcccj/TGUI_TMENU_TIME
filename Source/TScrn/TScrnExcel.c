@@ -118,7 +118,7 @@ void TScrnExcel_ReBulid(struct _TScrnExcel *pExcel)
   //更新数据完成
   if(pData->UpdateData(pData, 
                     TListboxEx_GetY(&pExcel->TListboxEx),
-                    TListboxEx_GetW(&pExcel->TListboxEx))){
+                    TListboxEx_GetH(&pExcel->TListboxEx))){
     //可能项长度改变了
     TListboxEx_SetItems(&pExcel->TListboxEx, pData->GetItemCount(pData));
     TScrnExcel_Refurbish(pExcel); //刷新内容
