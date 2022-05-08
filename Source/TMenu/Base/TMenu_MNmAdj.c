@@ -194,6 +194,10 @@ static char *_pGetItem(const TMenu_t *pMenu,//指向的菜单系统
   TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_MNUM_GET_DESC,&pMNumAdjData->User);
   pMNumAdjData->User.CurItem = PrvItem;
 
+  //非调整模式时，读取当前数据以实现实时更新
+  if(!(pMenu->Type & TM_MNUMADJ_WRITE))
+    TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_DATA,&pMNumAdjData->User);
+  
   pDesc = &pMNumAdjData->User.Desc;
   Flag = pDesc->Flag;
   //根据类型显示值
