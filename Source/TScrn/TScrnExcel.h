@@ -99,9 +99,6 @@ int TScrnExcel_Key(struct _TScrnExcel *pExcel, unsigned char Key);
 //-----------------------得到当前被选项对应的阵列ID-------------------------
 unsigned short Excel_GetAryId(const struct _TScrnExcel *pExcel);
 
-//---------------------得到光标位置函数------------------------------
-#define TScrnExcel_GetCursor(pexcel) TListboxEx_GetSel(&(pexcel)->TListboxEx)
-
 //---------------------得到垂直页大小函数------------------------------
 #define TScrnExcel_GetVPage(pexcel) TListboxEx_GetH((&(pexcel)->TListboxEx))
 
@@ -119,6 +116,9 @@ void TScrnExcel_ReBulid(struct _TScrnExcel *pExcel);
 //-----------------------------刷新函数---------------------------------
 void TScrnExcel_Refurbish(const struct _TScrnExcel *pExcel);
     
+//-----------------------------跳转到指定行函数---------------------------
+void TScrnExcel_JumpToLine(struct _TScrnExcel *pExcel,unsigned short Line);
+
 //----------------------跳转到指定AryId位置函数-------------------------
 //返回0成功
 signed char TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,

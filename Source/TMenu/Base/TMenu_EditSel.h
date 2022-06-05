@@ -72,6 +72,7 @@ struct _EditSelUser{
  //1:对应选择项
  //2:需要读取当前调整数字符串时,指明需要读取那一项
  TItemSize_t CurItem;
+ unsigned char DisEnter;//编辑模式禁止进入标志,可用于指令
  const char *pData;//对应子菜单项位置的当前数值
 };
 

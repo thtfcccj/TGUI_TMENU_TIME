@@ -183,6 +183,14 @@ unsigned short Excel_GetAryId(const struct _TScrnExcel *pExcel)
   return pData->LineToAryId(pData, Sel);
 }
 
+//-----------------------------跳转到指定行函数---------------------------
+void TScrnExcel_JumpToLine(struct _TScrnExcel *pExcel,unsigned short Line)
+{
+  if(Line >= TScrnExcel_GetItemCount(pExcel)) return;//异常
+  //置光标并更新当前位置
+  TListboxEx_SetSel(&pExcel->TListboxEx, Line);
+}
+
 //----------------------跳转到指定AryId位置函数-------------------------
 //返回0成功
 signed char TScrnExcel_JumpToAryId(struct _TScrnExcel *pExcel,

@@ -104,6 +104,7 @@ static signed char _EnterLaterPro(struct _EditSelData *pEditSelData,
 {
   TItemSize_t MaxItem = TM_GetSize(pMenu);
   //>=项数时通知用户区保存所有数据,否则表示通报进入对应项
+  pEditSelData->User.DisEnter = 0;
   TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_SET_DATA,&pEditSelData->User);
   //确认键后继处理:有保存键时通知用户保存处理
   if(/*(TM_GetType(pMenu) & TM_MEDITSEL_GRP_SAVE) &&*/
@@ -118,9 +119,12 @@ static signed char _EnterLaterPro(struct _EditSelData *pEditSelData,
        TListBoxEx_PaintAll(&pEditSelData->ListboxEx);//更新显示
      }
   }
-  else{
+  else if(pEditSelData->User.DisEnter == 0){//允许进入时
     if(TM_GetType(pMenu) & TM_MEDITSEL_EN_EDIT)//允许调整时表示进入子菜单进行调整
       return (signed char)(pEditSelData->User.CurItem);
+  }
+  else{//不允许进入时,可能内容变了,强制更新
+    TListBoxEx_PaintAll(&pEditSelData->ListboxEx);
   }
   pEditSelData->Flag &= ~_FLAG_ENTER;
   return -1;
