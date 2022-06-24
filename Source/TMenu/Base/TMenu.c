@@ -150,6 +150,10 @@ void TMenu_Refresh(void)
   if(Type == TMTYPE_EDITSTRING){
     return;
   }
+  if(Type == TMTYPE_MNUMADJ){//多值模式
+    TMenu_MNumAdjRefresh(pCurMenu,&pMng->vData);
+    return;
+  }  
   
   //其它模式直接利用继承关系
   ListBox_PaintAll((TListbox_t *)(&pMng->vData));

@@ -198,6 +198,11 @@ signed char TMenu_MNumAdjKey(const TMenu_t *pMenu,    //指向的菜单系统
                              unsigned char Key,       //送入的键值
                              void *pv);      //已被使用的自由数据缓冲区
 
+//------------------------刷新数据----------------------------
+//需动态更新数据时使用(需响应TM_NOTIFY_CHANGED更新每项数值)
+void TMenu_MNumAdjRefresh(const TMenu_t *pMenu,    //指向的菜单系统
+                          void *pv);      //可供使用的自由缓冲区
+
 //-----------------------多值调整模式列框框通报回调实现函数------------------------
 //仅供内部通报使用
 const void*TMenu_MNumAdjListBoxNotify(void *pvPource,

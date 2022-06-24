@@ -142,12 +142,17 @@ signed char TMenu_EditSelKey(const TMenu_t *pMenu,    //指向的菜单系统
   PushMenu(pMenu);
   PushData(pv);
   
+  //#ifdef TM_EN_RPC
+  //  TItemSize_t Item = pEditSelData->User.CurItem;  
+  //#endif
+    
   TListboxEx_Key(&pEditSelData->ListboxEx,Key);
   
   //按键后期处理
   Flag = pEditSelData->Flag;
   
   //数字键后处理:当做快捷键处理
+
   if((Key >= '1') && (Key <= '9')){
     pEditSelData->User.CurItem = TListboxEx_GetSel(&pEditSelData->ListboxEx);
     Flag |= _FLAG_ENTER;
@@ -160,6 +165,12 @@ signed char TMenu_EditSelKey(const TMenu_t *pMenu,    //指向的菜单系统
   else if(Flag & _FLAG_RETURN)
     return -2;
 
+  //没有进入或退出，在支持RPC时，检查选择项，若改变则通报改变以让用户层作好准备
+  //#ifdef TM_EN_RPC
+  //  if((Item != pEditSelData->User.CurItem) && (pEditSelData->User.CurItem < TM_GetSize(pMenu)))
+  //    TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_CUSOR_CHANGED, &pEditSelData->User.CurItem);
+  //#endif
+  
   return -1;
 }
 
@@ -226,6 +237,11 @@ signed char TMenu_EditSelCreate(const TMenu_t *pMenu,    //指向的菜单系统
     pEditSelData->HeaderW += CurLen;
     pEditSelData->ItemsW += CurLen;
   }
+  
+  //支持RPC时，可能默认位置即需要更新RPC数据,故先通报
+  #ifdef TM_EN_RPC
+    TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_CUSOR_CHANGED, &pEditSelData->User.CurItem);
+  #endif
   
   //更新显示
   TMenu_ReBulidWin(&pEditSelData->ListboxEx,//重置窗口大小

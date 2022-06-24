@@ -391,7 +391,7 @@ signed char TMenu_MNumAdjCreate(const TMenu_t *pMenu,    //指向的菜单系统
 
 
   //读取当前数据
-  TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_DATA,&pMNumAdjData->User);
+  TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_DATA, &pMNumAdjData->User);
 
 
   TListboxEx_Init(&pMNumAdjData->ListboxEx,  //由用户分配的存储空间
@@ -427,6 +427,16 @@ signed char TMenu_MNumAdjCreate(const TMenu_t *pMenu,    //指向的菜单系统
        (TM_MNUMADJ_LOOP_MODE | TM_MNUMADJ_WRITE))) 
     TMenu_MNumAdjKey(pMenu,TGUI_KEY_ENTER,pv);
   return -1;
+}
+
+//------------------------刷新数据----------------------------
+//需动态更新数据时使用
+void TMenu_MNumAdjRefresh(const TMenu_t *pMenu,    //指向的菜单系统
+                          void *pv)      //可供使用的自由缓冲区
+{
+  struct _MNumAdjData *pMNumAdjData = (struct _MNumAdjData *)pv;
+  TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_DATA, &pMNumAdjData->User);
+  TListBoxEx_PaintAll(&pMNumAdjData->ListboxEx);
 }
 
 
