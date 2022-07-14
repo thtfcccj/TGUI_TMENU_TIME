@@ -56,7 +56,7 @@ const char *_pGetCurStr(struct _TImeSign *pSign,//输入法结构
 {
   unsigned char StrPos = pSign->GrpStart;
   if(pSign->Len > _SIGNAL_PAGE_MAX)//一页不能显示下时,有下一页
-      StrPos += (pSign->FirstKey * 4 + TIme_GuideKeyToNoEnterKey[GuideKey]) * 2;
+      StrPos += (pSign->FirstKey * 5 + TIme_GuideKeyToNoEnterKey[GuideKey]) * 2;
   else StrPos += (pSign->FirstKey * 5 + GuideKey) * 2;//一页能显示下了
   
   if((StrPos + 2) > pSign->Len) return NULL;//超过长度了
@@ -87,17 +87,14 @@ const char *TImeSign_pGetArrowNotice(struct _TImeSign *pSign,//输入法结构
   }
   
   //============================选择分组时======================
-  unsigned char GroupCount; //一页内显示字符组数,
   if(pSign->Len > _SIGNAL_PAGE_MAX){//一页不能显示下时,有下一页
     //选确认键时，确认键表示下一组
     if(GuideKey == TIME_MNG_KEY_ENTER) 
       return _chNextGroup;
     GuideKey = TIme_GuideKeyToNoEnterKey[GuideKey]; //转换为4组
-    GroupCount = 4;
   }
-  else GroupCount = 5; //一页显示下时，确认键为正常选择
   
-  unsigned char StrPos = pSign->GrpStart + GuideKey * (2 * GroupCount);
+  unsigned char StrPos = pSign->GrpStart + GuideKey * (2 * 5);//一组5个
   if((StrPos + 2) > pSign->Len) return NULL;//超过长度了(1个也算一组)
   unsigned char Len = pSign->Len - StrPos;
   if(Len > 10) Len = 10;

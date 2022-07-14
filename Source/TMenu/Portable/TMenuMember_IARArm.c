@@ -156,6 +156,9 @@ const char *TM_GetSubMenuHeader(const TMenu_t *pMenu,
   TMenu_t const *const *PAry = (TMenu_t const *const *)pMenu->pv;  //C51的方式
 
   #ifdef TM_EN_LUT//有表时先查表
+    #ifdef TM_EN_RPC
+      unsigned char PrvItem = Item;//表前
+    #endif
     Item = _GetItemVol(pMenu, Item);
   #endif
 
@@ -167,6 +170,12 @@ const char *TM_GetSubMenuHeader(const TMenu_t *pMenu,
     TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_SUB_HEADER, pBuf);
     if(*(pBuf + 1) != '\0') return pBuf; //从用户空间直接获得了
     //否则继续
+    #ifdef TM_EN_LUT//有表时,再尝试用原始值查表
+      *pBuf = PrvItem;
+      TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_SUB_HEADER_ORG, pBuf);
+      if(*(pBuf + 1) != '\0') return pBuf; //从用户空间直接获得了
+    #endif //TM_EN_LUT
+    //否则继续  
   #endif
   
   #ifdef TM_DYNC_MENU   //动态菜单支持时通报更新子菜单

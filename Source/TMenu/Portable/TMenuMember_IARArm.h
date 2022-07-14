@@ -71,7 +71,7 @@ struct _TMenuSelRO{
   //更新父菜单通报 更新父菜单结构(pv指针无用)
   #define    TM_NOTIFY_USER_UPDATE_PARENT    (TM_NOTIFY_USER_BASE + 1)
 
-  //更新子菜单通报 更新指字子菜单结构(pv指针指向当前子菜单的ID号)
+  //(已查表)更新子菜单通报 更新指字子菜单结构(pv指针指向当前子菜单的查表后ID号)
   #define    TM_NOTIFY_USER_UPDATE_SUB    (TM_NOTIFY_USER_BASE + 2)
   
 #endif //#ifdef TM_DYNC_MENU
