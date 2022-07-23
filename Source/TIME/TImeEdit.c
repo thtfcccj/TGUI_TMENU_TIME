@@ -32,7 +32,8 @@ static signed char _IsAlign(const char *pString,    //字符串
 void TImeEdit_Init(struct _TImeEdit *pEdit,
                   char *pString,       //被修改的字符串
                   TIme_String_t Size,  //字符串缓冲区允许大小+1
-                  TIme_String_t w)     //编辑框宽度
+                  TIme_String_t w，    //编辑框宽度
+                  TIme_String_t Cursor)//默认光标位置,-1时为最后
 {
   memset(pEdit, 0, sizeof(struct _TImeEdit));
   
@@ -47,7 +48,9 @@ void TImeEdit_Init(struct _TImeEdit *pEdit,
     Len = Size - 1;
   }
   pEdit->Len = Len;
-  pEdit->Cursor = Len;//默认从最后位置开始编辑 
+  if(Cursor > Len) 
+    pEdit->Cursor = Len;//默认从最后位置开始编辑
+  else pEdit->Cursor = Cursor;//默认所处位置
   //光标指向最后一个编辑框宽度窗口,注意光标占一位
   if(Len < w) DispStart = 0;
   else{

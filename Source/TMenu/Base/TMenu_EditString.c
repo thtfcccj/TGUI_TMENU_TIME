@@ -17,6 +17,8 @@ signed char TMenu_EditStringCreate(const TMenu_t *pMenu,    //指向的菜单系统
 {
   struct _EditStringData *pEditStringData = (struct _EditStringData *)pv;
   //从用户空间获得并设置当前所选项
+  pEditStringData->User.DefaultCursor = (TIme_String_t)-1;//默认在最后
+  
   TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_DATA,&pEditStringData->User);
   pEditStringData->pImeMng = TMenu_EditString_cbpGetImeMng();
   
@@ -26,7 +28,8 @@ signed char TMenu_EditStringCreate(const TMenu_t *pMenu,    //指向的菜单系统
                   pEditStringData->User.Size,     //字符串缓冲区允许大小
                   pEditStringData->User.DefaultType,   //默认输入法,<4
                   pEditStringData->User.TypeMask,//可使用的输入法类型 
-                  (const char*)(pMenu->pv))) //挂接的符号表,为空时使用默认
+                  (const char*)(pMenu->pv), //挂接的符号表,为空时使用默认
+                  pEditStringData->User.DefaultCursor))//默认光标位置
     return 0;//创建不成功!
   return -1;
 }

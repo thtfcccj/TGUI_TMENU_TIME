@@ -438,7 +438,7 @@ const unsigned char  U8ShiftLUT[8] = {
 };
 
 //-----------------TGUI所需要的临时字符串缓冲----------------------
-#ifdef TGUI_BUF_SIZE
+#ifdef TGUI_BUF_SIZE //自定义大小时
   unsigned long _TGUI_Buf[TGUI_BUF_SIZE / 4];	//考虑到显示区会超过显示屏,故加大容量
 #else
   unsigned long _TGUI_Buf[TLCD_WIDTH / 2];	//考虑到显示区会超过显示屏,故加大容量

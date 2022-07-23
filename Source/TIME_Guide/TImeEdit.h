@@ -65,7 +65,8 @@ struct _TImeEdit{
 void TImeEdit_Init(struct _TImeEdit *pEdit,
                   char *pString,       //被修改的字符串
                   TIme_String_t Size,  //字符串缓冲区允许大小+1
-                  TIme_String_t w);     //编辑框宽度
+                  TIme_String_t w,     //编辑框宽度
+                  TIme_String_t Cursor);//默认光标位置,-1时为最后
 
 //--------------------得到相对光标位置函数---------------------------
 //即在当前显示起始开始的光标位置，用于上层焦点区反显

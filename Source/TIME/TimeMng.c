@@ -84,7 +84,8 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
                          TIme_String_t Size,     //字符串缓冲区允许大小+1
                          unsigned char DefaultType,   //默认输入法<4
                          unsigned char TypeMask,      //可使用的输入法类型 
-                         const char *pSignTbl) //挂接的符号表,为空时使用默认
+                         const char *pSignTbl, //挂接的符号表,为空时使用默认
+                         TIme_String_t Cursor) //默认光标位置,-1时为最后
 {
   unsigned char w,h;
   //检查窗口是否够显示
@@ -109,7 +110,7 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
   pIme->h = h;
   //初始化除Data区域的成员
   pIme->pWin = pWin;
-  TImeEdit_Init(&pIme->Edit,pString,Size,pIme->w);//初始化编辑器  
+  TImeEdit_Init(&pIme->Edit,pString,Size,pIme->w, Cursor);//初始化编辑器  
   pIme->pSignTbl = pSignTbl;  
   if(DefaultType >= 4) DefaultType = 0;//强制纠错
   pIme->TypeMask = TypeMask;

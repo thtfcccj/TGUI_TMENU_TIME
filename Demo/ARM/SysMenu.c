@@ -24,7 +24,11 @@ enum eLan_t GetLan(void)
 
 //--------------TMenu所需要的自由数据缓冲------------------
 //,>一行用到是最长字符,最后值用于部分中间值的缓冲(如MNumAdj中)
-unsigned long _Buf[(TLCD_WIDTH + 16) / 4];
+#ifdef TMENU_BUF_SIZE  //定义有缓冲区大小时
+  unsigned long _Buf[TMENU_BUF_SIZE / 4];
+#else
+  unsigned long _Buf[(TLCD_WIDTH + 16) / 4];
+#endif 
 void *TMenu_pGetBuf(void){
   return _Buf;
 }

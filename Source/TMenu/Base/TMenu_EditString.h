@@ -37,7 +37,8 @@ struct _EditStringUser{
   char *pString;              //用户已存在的字符串,必须以'\0'结尾
   TIme_String_t Size;         //字符串缓冲区允许大小
   unsigned char DefaultType; //默认输入法,<4
-  unsigned char TypeMask;     //可使用的输入法类型 
+  unsigned char TypeMask;     //可使用的输入法类型
+  TIme_String_t DefaultCursor; //默认光标位置,-1时为最后
 };
 //用户回调函数响应类型及需实现的功能有:
 //1:类型为:TM_NOTIFY_GET_DATA时,需将当前User结构所有成员初始化

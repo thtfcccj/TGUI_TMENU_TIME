@@ -110,7 +110,8 @@ signed char TImeMng_Init(struct _TImeMng *pIme,  //带入的输入法结构缓冲
                          TIme_String_t Size,     //字符串缓冲区允许大小+1
                          unsigned char DefaultType,   //默认输入法,<4
                          unsigned char TypeMask,//可使用的输入法类型 
-                         const char *pSignTbl); //挂接的符号表,为空时使用默认
+                         const char *pSignTbl, //挂接的符号表,为空时使用默认
+                         TIme_String_t Cursor); //默认光标位置,-1时为最后
 
 //----------------------------按键处理函数---------------------------------
 //用户按数字键区与导航键区时调用此函数
