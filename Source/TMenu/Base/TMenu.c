@@ -117,6 +117,16 @@ void TMenu_GogoMenu(const TMenu_t *pCurMenu, //强制跳入的菜单结构
   GotoMenuData.MenuID = MenuID;
 }
 
+//-----------------------返回上级菜单------------------------
+//已是顶层菜单时不会退出
+void TMenu_ReturnUp(void)
+{
+  struct _TMenuMng *pMng = TMenu_GetCurMenuMng();
+  if(pMng->pCurMenu == NULL) return;//不在菜单中
+  if(pMng->Trace.Layer == 0) return;//已是顶层菜单时不退出
+  TMenu_GogoMenu(TM_pGetParent(pMng->pCurMenu), pMng->Trace.Layer - 1, 0);
+}
+
 //----------------------得到跳转的菜单项-------------------
 //返回NULL表示无后继菜单
 static const TMenu_t *_GetGogoMenu(void)  //该结构所在菜单内的层次
