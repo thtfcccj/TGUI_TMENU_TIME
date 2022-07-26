@@ -7,6 +7,9 @@
 #ifndef __T_GUI_H 
 #define __T_GUI_H
 
+//定义当前版本(原版本或其分支见git)
+#define TGUI_STR_VERSION    "TGUI  V5.20"  
+
 //基本结构:
 #include "TWin.h"       //窗口操作
 #include "TWM.h"   //窗口管理器操作
