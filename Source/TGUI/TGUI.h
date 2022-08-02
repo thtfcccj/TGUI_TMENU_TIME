@@ -8,6 +8,7 @@
 #define __T_GUI_H
 
 //定义当前版本(原版本或其分支见git)
+//此软件模块采用MIT协议， 请在您在你设备适当位置放置此字符串的显示
 #define TGUI_STR_VERSION    "TGUI  V5.20"  
 
 //基本结构:
