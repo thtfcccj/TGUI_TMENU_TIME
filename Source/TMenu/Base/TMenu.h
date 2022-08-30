@@ -15,7 +15,7 @@ TMenu是建立在TGUI之上的一套菜单系统,它可以完成单色屏上的参数调整与显示
 
 //定义当前版本(原版本或其分支见git)
 //此软件模块采用MIT协议， 请在您在你设备适当位置放置此字符串的显示
-#define TMENU_STR_VERSION    "TMENU V4.20"  
+#define TMENU_STR_VERSION    "TMENU V4.21"  
 
 /**********************************************************************
                          不支持此模块时定义
@@ -191,7 +191,19 @@ const char *TM_GetItemString(const TMenu_t *pMenu,
 //-------------------统计菜单项最大宽度函数-----------------------
 TItemSize_t TM_GetItemMaxLen(const TMenu_t *pMenu);
 
+//-------------------用户数据转换为Checkbox数据---------------------
+//替换TCheckbox_SetAllCheck()
+void TM_CheckboxSetAllCheck(const TMenu_t *pMenu,  //菜单
+                            TCheckbox_t *pCheckbox, //pCheckbox
+                            unsigned char *pCheck, //用户输入的掩码
+                            TItemSize_t Items);     //项总数
 
+//-------------------Checkbox数据转换为用户数据---------------------
+//替换TCheckbox_GetAllCheck()
+void TM_CheckboxGetAllCheck(const TMenu_t *pMenu,  //菜单
+                            TCheckbox_t *pCheckbox, //pCheckbox
+                            unsigned char *pCheck, //用户输入的掩码
+                            TItemSize_t Items);      //项总数
 
 #endif //#define __T_MENU_H
 

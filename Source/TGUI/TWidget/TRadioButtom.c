@@ -29,7 +29,7 @@ const void*TRadioButtom_Notify(void *pv,
   case TGUI_NOTIFY_KEY_ENTER: //确认键时检查焦点位置
   if(pRadioButtom->Radio != Item){//当前项被选中了
     //不在附加项里时,当附加项里有确认键时可到此
-    if((Item < (TListboxEx_GetItems((TListboxEx_t*)pRadioButtom)) - 1) || 
+    if((Item < TListboxEx_GetItems((TListboxEx_t*)pRadioButtom)) || 
       !TListboxEx_HaveAppend((TListboxEx_t*)pRadioButtom)){
 	      pRadioButtom->Radio = Item;
     }

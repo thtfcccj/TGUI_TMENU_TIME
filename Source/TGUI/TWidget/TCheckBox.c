@@ -72,7 +72,7 @@ const void* TCheckBox_Notify(void *pvSource,
   switch(Type){
   case TGUI_NOTIFY_KEY_ENTER: //确认键时反选所选项目
     //不在附加项里时,当附加项里有确认键时可到此
-    if((Item < (TListboxEx_GetItems((TListboxEx_t*)pCheckbox)) - 1) || 
+    if((Item < TListboxEx_GetItems((TListboxEx_t*)pCheckbox)) || 
       !TListboxEx_HaveAppend((TListboxEx_t*)pCheckbox)){
       pCurItem = &(pCheckbox->SelMask[Item >> 3]);
       Mask = U8ShiftLUT[Item & 0x07];

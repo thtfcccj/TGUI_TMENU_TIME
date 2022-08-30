@@ -242,6 +242,64 @@ unsigned char TMenu_GetItemPosWithLUT(unsigned char Pos)
   return _ItemLUT[Pos + 1];
 }
     
-
+//-------------------用户数据转换为Checkbox数据---------------------
+//替换TCheckbox_SetAllCheck()
+void TM_CheckboxSetAllCheck(const TMenu_t *pMenu,  //菜单
+                            TCheckbox_t *pCheckbox, //pCheckbox
+                            unsigned char *pCheck, //用户输入的掩码
+                            TItemSize_t Items)      //项总数
+{
+  #ifndef TM_EN_LUT//不支持查找表时
+    TCheckbox_SetAllCheck(pCheckbox, pCheck, Items);
+  #else
+    //无查找表时，直接就是
+    if(!(pMenu->Size & TM_TYPE_ITEM_LUT)){
+      TCheckbox_SetAllCheck(pCheckbox, pCheck, Items);
+      return;
+    }
+    //有表时，需依次转换
+    Items = TM_GetSize(pMenu); //查表后大小
+    
+    //用户数据转Checkbox数据
+    unsigned char *pSelMask = pCheckbox->SelMask;
+    for(unsigned char Item = 0; Item < Items; Item++){
+      unsigned char Pos = _GetLutItem(pMenu, Item);
+      if(*(pCheck + (Pos >> 3)) & ((unsigned char)1 << (Pos & 0x07)))
+        *(pSelMask + (Item >> 3)) |= ((unsigned char)1 << (Item & 0x07));
+      else
+        *(pSelMask + (Item >> 3)) &= ~((unsigned char)1 << (Item & 0x07));
+    }
+  #endif //TM_EN_LUT
+}
+  
+//-------------------Checkbox数据转换为用户数据---------------------
+//替换TCheckbox_GetAllCheck()
+void TM_CheckboxGetAllCheck(const TMenu_t *pMenu,  //菜单
+                            TCheckbox_t *pCheckbox, //pCheckbox
+                            unsigned char *pCheck, //用户输入的掩码
+                            TItemSize_t Items)      //项总数
+{
+  #ifndef TM_EN_LUT//不支持查找表时
+    TCheckbox_GetAllCheck(pCheckbox, pCheck, Items);
+  #else
+    //无查找表时，直接就是
+    if(!(pMenu->Size & TM_TYPE_ITEM_LUT)){
+      TCheckbox_GetAllCheck(pCheckbox, pCheck, Items);
+      return;
+    }
+    //有表时，需依次转换
+    Items = TM_GetSize(pMenu); //查表后大小
+    
+    //Checkbox数据转用户数据
+    unsigned char *pSelMask = pCheckbox->SelMask;
+    for(unsigned char Item = 0; Item < Items; Item++){
+      unsigned char Pos = _GetLutItem(pMenu, Item);
+      if(*(pSelMask + (Item >> 3)) & ((unsigned char)1 << (Item & 0x07)))
+       *(pCheck + (Pos >> 3)) |= ((unsigned char)1 << (Pos & 0x07));
+      else
+       *(pCheck + (Pos >> 3)) &= ~((unsigned char)1 << (Pos & 0x07));
+    }
+  #endif //TM_EN_LUT
+}
 
 

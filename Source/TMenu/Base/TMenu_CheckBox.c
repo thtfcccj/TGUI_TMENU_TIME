@@ -77,8 +77,8 @@ signed char TMenu_CheckBoxCreate(const TMenu_t *pMenu,    //指向的菜单系统
   
   //从用户空间获得并设置当前所选项
   TMENU_NOTIFY_RUN(pMenu->cbNotify,TM_NOTIFY_GET_DATA,&pCheckboxData->User);
-  
-  TCheckbox_SetAllCheck(pCheckbox,pCheckboxData->User.SelMask,Data);
+  //用户数据转换为Checkbox数据(替换TCheckbox_SetAllCheck)
+  TM_CheckboxSetAllCheck(pMenu, pCheckbox, pCheckboxData->User.SelMask, Data); 
                         
   //初始化其它数据
   pCheckboxData->Flag = 0;
@@ -109,14 +109,14 @@ signed char TMenu_CheckBoxKey(const TMenu_t *pMenu,    //指向的菜单系统
   //确认键后继处理
   if(pCheckboxData->Flag & _FLAG_ENTER){
     Data = TM_GetSize(pMenu);//复用
-    //更新数据
-    TCheckbox_GetAllCheck(&pCheckboxData->Checkbox,
-                            pCheckboxData->User.SelMask,Data);
-    if(pCheckboxData->User.ChanegedItem < Data) 
-      Data = TM_NOTIFY_CHANGED;
-    else{
-      Data = TM_NOTIFY_SET_DATA;
+    if(pCheckboxData->User.ChanegedItem < Data){ 
+      //更新数据,替换TCheckbox_GetAllCheck();
+      TM_CheckboxGetAllCheck(pMenu, &pCheckboxData->Checkbox,pCheckboxData->User.SelMask,Data);
+      Data = TM_NOTIFY_CHANGED; 
+    }
+    else{//确认键上了
       TListboxEx_Key((TListboxEx_t*)&pCheckboxData->Checkbox,TGUI_KEY_DOWN); //到退出位置
+      Data = TM_NOTIFY_SET_DATA;
     }
     //通知用户区
     TMENU_NOTIFY_RUN(pMenu->cbNotify,Data,&pCheckboxData->User);
